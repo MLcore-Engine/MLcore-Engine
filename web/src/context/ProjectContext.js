@@ -166,7 +166,7 @@ export const ProjectProvider = ({ children }) => {
       const updatedProject = await projectAPI.updateProject(projectId, projectData);
       setProjects((prevProjects) =>
         prevProjects.map((project) =>
-          project.id === projectId ? updatedProject : project
+          project.ID === projectId ? updatedProject : project
         )
       );
     } catch (err) {
@@ -185,7 +185,7 @@ export const ProjectProvider = ({ children }) => {
     try {
       await projectAPI.deleteProject(projectId);
       setProjects((prevProjects) =>
-        prevProjects.filter((project) => project.id !== projectId)
+        prevProjects.filter((project) => project.ID !== projectId)
       );
     } catch (err) {
       setError(err.message);

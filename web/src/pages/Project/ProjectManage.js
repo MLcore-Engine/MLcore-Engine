@@ -9,17 +9,18 @@ const ProjectManage = () => {
     error,
     addProjectMember,
     removeProjectMember,
+    updateProjectMemberRole, // Assuming you might use this
   } = useProjects();
 
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newUser, setNewUser] = useState({ username: '', role: 'user' });
+  const [newUser, setNewUser] = useState({ userId: '', role: 0 });
   const [modalError, setModalError] = useState('');
 
   const handleAddUser = (project) => {
     setSelectedProject(project);
     setModalError('');
-    setNewUser({ username: '', role: 'user' });
+    setNewUser({ userId: '', role: 0 });
     setIsModalOpen(true);
   };
 
@@ -32,14 +33,14 @@ const ProjectManage = () => {
   };
 
   const handleSubmitNewUser = async () => {
-    if (!newUser.username) {
-      setModalError('用户名不能为空');
+    if (!newUser.userId) {
+      setModalError('用户ID不能为空');
       return;
     }
     try {
-      await addProjectMember(selectedProject.id, newUser);
+      await addProjectMember(selectedProject.ID, newUser);
       setIsModalOpen(false);
-      setNewUser({ username: '', role: 'user' });
+      setNewUser({ userId: '', role: 0 });
       setModalError('');
     } catch (err) {
       setModalError(err.message);
@@ -51,9 +52,9 @@ const ProjectManage = () => {
 
   return (
     <div>
-      <h2>项目管理</h2>
+      <h2>项目成员管理</h2>
       {projects.map((project) => (
-        <div key={project.id} style={{ marginBottom: '2em' }}>
+        <div key={project.ID} style={{ marginBottom: '2em' }}>
           <h3>{project.name}</h3>
           <Table celled>
             <Table.Header>
@@ -64,16 +65,16 @@ const ProjectManage = () => {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {project.members && project.members.length > 0 ? (
-                project.members.map((user) => (
-                  <Table.Row key={user.userId}>
+              {project.users && project.users.length > 0 ? (
+                project.users.map((user) => (
+                  <Table.Row key={user.ID}>
                     <Table.Cell>{user.username}</Table.Cell>
-                    <Table.Cell>{user.role}</Table.Cell>
+                    <Table.Cell>{getRoleName(user.role)}</Table.Cell>
                     <Table.Cell>
                       <Button
                         icon
                         color="red"
-                        onClick={() => handleRemoveUser(project.id, user.userId)}
+                        onClick={() => handleRemoveUser(project.ID, user.ID)}
                       >
                         <Icon name="trash" />
                       </Button>
@@ -98,20 +99,21 @@ const ProjectManage = () => {
         <Modal.Content>
           <Form error={!!modalError}>
             <Form.Input
-              label="用户名"
-              value={newUser.username}
-              onChange={(e, { value }) => setNewUser({ ...newUser, username: value })}
-              placeholder="输入用户名"
+              label="用户ID"
+              value={newUser.userId}
+              onChange={(e, { value }) => setNewUser({ ...newUser, userId: value })}
+              placeholder="输入用户ID"
             />
             <Form.Select
               label="角色"
               options={[
-                { key: 'user', text: '用户', value: 'user' },
-                { key: 'admin', text: '管理员', value: 'admin' },
-                { key: 'root', text: '根用户', value: 'root' },
+                { key: '0', text: '用户', value: 0 },
+                { key: '1', text: '管理员', value: 1 },
+                { key: '2', text: '根用户', value: 2 },
               ]}
               value={newUser.role}
               onChange={(e, { value }) => setNewUser({ ...newUser, role: value })}
+              placeholder="选择角色"
             />
             {modalError && <Message error content={modalError} />}
           </Form>
@@ -125,6 +127,20 @@ const ProjectManage = () => {
       </Modal>
     </div>
   );
+};
+
+// Helper function to convert role number to role name
+const getRoleName = (role) => {
+  switch (role) {
+    case 0:
+      return '用户';
+    case 1:
+      return '管理员';
+    case 2:
+      return '根用户';
+    default:
+      return '未知';
+  }
 };
 
 export default ProjectManage;

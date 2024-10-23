@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Icon, Modal, Form, Message } from 'semantic-ui-react';
 import DataList from '../../components/common/DataList';
 import { useProjects } from '../../context/ProjectContext';
+import { toast } from 'react-toastify';
 
 const ProjectGroupOrg = () => {
   const {
@@ -28,7 +29,7 @@ const ProjectGroupOrg = () => {
   const handleEdit = (project) => {
     setModalType('edit');
     setProjectData({ name: project.name, description: project.description });
-    setSelectedProjectId(project.id);
+    setSelectedProjectId(project.ID);
     setModalError('');
     setIsModalOpen(true);
   };
@@ -36,8 +37,10 @@ const ProjectGroupOrg = () => {
   const handleDelete = async (id) => {
     try {
       await deleteProject(id);
+      toast.success('Project deleted successfully.');
     } catch (err) {
       console.error(err.message);
+      toast.error(err.message || 'Failed to delete project.');
     }
   };
 
@@ -76,7 +79,7 @@ const ProjectGroupOrg = () => {
         columns={columns}
         onAdd={handleAdd}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        onDelete={(project) => handleDelete(project.ID)}
       />
 
       <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
