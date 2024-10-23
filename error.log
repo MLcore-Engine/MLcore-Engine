@@ -1,0 +1,3 @@
+[FATAL] 2024/10/23 - 14:09:21 | [UNIQUE constraint failed: users.email] 
+[FATAL] 2024/10/23 - 14:10:18 | [UNIQUE constraint failed: users.github_id] 
+[FATAL] 2024/10/23 - 14:10:42 | [duplicate column name: created_at] 

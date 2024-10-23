@@ -1,0 +1,110 @@
+server:
+  port: 8080
+  mode: debug
+
+database:
+  host: localhost
+  port: 5432
+  user: myuser
+  password: mypassword
+  dbname: mydb
+
+notebook:
+  namespace: jupyter
+  image:
+    notebookcpu: gaoxin2020/notebook-tgqs:jupyter-ubuntu-cpu-base
+    notebookgpu: 
+    vscodecpu: 
+    vscodegpu:
+  schedule: default-scheduler
+  externalIP: 192.168.8.208
+  volumes:
+    userWorkspace: kubeflow-user-workspace
+    archives: kubeflow-archives
+  defaultPort: 3000
+
+  
+crds:
+  workflow:
+    group: argoproj.io
+    version: v1alpha1
+    plural: workflows
+    kind: Workflow
+    timeout: 6060242
+  mpijob:
+    group: kubeflow.org
+    version: v1
+    plural: mpijobs
+    kind: MPIJob
+    timeout: 172800
+  tfjob:
+    group: kubeflow.org
+    version: v1
+    plural: tfjobs
+    kind: TFJob
+    timeout: 6060242
+  xgbjob:
+    group: xgboostjob.kubeflow.org
+    version: v1alpha1
+    plural: xgboostjobs
+    timeout: 1212048
+  experiment:
+    group: kubeflow.org
+    version: v1alpha3
+    plural: experiments
+    kind: Experiment
+    timeout: 172800
+  pytorchjob:
+    group: kubeflow.org
+    version: v1
+    kind: PyTorchJob
+    plural: pytorchjobs
+    timeout: 172800
+  notebook:
+    group: kubeflow.org
+    version: v1
+    plural: notebooks
+    kind: Notebook
+    timeout: 172800
+  inferenceservice:
+    group: serving.kserve.io
+    version: v1beta1
+    plural: inferenceservices
+    kind: InferenceService
+    timeout: 86400
+  virtualservice:
+    group: networking.istio.io
+    version: v1alpha3
+    plural: virtualservices
+    kind: VirtualService
+    timeout: 86400
+  framework:
+    group: frameworkcontroller.microsoft.com
+    version: v1
+    plural: frameworks
+    kind: Framework
+    timeout: 172800
+  vcjob:
+    group: batch.volcano.sh
+    version: v1alpha1
+    kind: Job
+    plural: jobs
+    timeout: 172800
+  sparkjob:
+    group: sparkoperator.k8s.io
+    version: v1beta2
+    kind: SparkApplication
+    plural: sparkapplications
+    timeout: 172800
+  paddlejob:
+    group: batch.paddlepaddle.org
+    version: v1
+    kind: PaddleJob
+    plural: paddlejobs
+    timeout: 172800
+  mxjob:
+    group: kubeflow.org
+    version: v1
+    kind: MXJob
+    plural: mxjobs
+    timeout: 172800

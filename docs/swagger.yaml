@@ -1,0 +1,679 @@
+basePath: /api
+definitions:
+  controller.ErrorResponse:
+    properties:
+      error:
+        example: Invalid user ID
+        type: string
+    type: object
+  controller.NotebookResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.Notebook'
+      message:
+        example: Notebook created successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  controller.NotebookUpdateRequest:
+    properties:
+      mount_path:
+        type: string
+      resource_cpu:
+        type: string
+      resource_gpu:
+        type: integer
+      resource_memory:
+        type: string
+      service_port:
+        type: integer
+    type: object
+  controller.NotebooksListData:
+    properties:
+      notebooks:
+        items:
+          $ref: '#/definitions/model.Notebook'
+        type: array
+      page:
+        example: 1
+        type: integer
+      pageSize:
+        example: 20
+        type: integer
+      total:
+        example: 10
+        type: integer
+    type: object
+  controller.NotebooksResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.NotebooksListData'
+      message:
+        example: ""
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  controller.ProjectsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.UserProject'
+        type: array
+      success:
+        example: true
+        type: boolean
+    type: object
+  controller.RoleUpdateRequest:
+    properties:
+      role:
+        example: 2
+        type: integer
+    required:
+    - role
+    type: object
+  controller.SuccessResponse:
+    properties:
+      message:
+        example: User successfully removed from project
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  controller.UpdateUserProjectRoleResponse:
+    properties:
+      data:
+        properties:
+          projectId:
+            example: 1
+            type: integer
+          role:
+            example: admin
+            type: string
+          userId:
+            example: 1
+            type: integer
+        type: object
+      message:
+        example: User role in project successfully updated
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  controller.UserProjectRequest:
+    properties:
+      projectId:
+        example: 1
+        type: integer
+      role:
+        example: 1
+        type: integer
+      userId:
+        example: 1
+        type: integer
+    type: object
+  controller.UserProjectResponse:
+    properties:
+      data:
+        properties:
+          projectId:
+            example: 1
+            type: integer
+          role:
+            example: admin
+            type: string
+          userId:
+            example: 1
+            type: integer
+        type: object
+      message:
+        example: User successfully added to project
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  model.Notebook:
+    type: object
+  model.Project:
+    properties:
+      createTime:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updateTime:
+        type: string
+    type: object
+  model.UserProject:
+    properties:
+      projectId:
+        type: integer
+      role:
+        description: root 1000, admin 100, common 1
+        type: integer
+      userId:
+        type: integer
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: This is the API documentation for MLcore-Engine.
+  title: MLcore-Engine API
+  version: "1.0"
+paths:
+  /notebook:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Notebook with the provided details
+      parameters:
+      - description: Notebook details
+        in: body
+        name: notebook
+        required: true
+        schema:
+          $ref: '#/definitions/model.Notebook'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.NotebookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Create a new Notebook
+      tags:
+      - notebook
+  /notebook/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Notebook by its ID
+      parameters:
+      - description: Notebook ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Delete a Notebook
+      tags:
+      - notebook
+    get:
+      consumes:
+      - application/json
+      description: Get a Notebook by its ID
+      parameters:
+      - description: Notebook ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.NotebookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Get a Notebook
+      tags:
+      - notebook
+    put:
+      consumes:
+      - application/json
+      description: Update a Notebook by its ID
+      parameters:
+      - description: Notebook ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Notebook update details
+        in: body
+        name: notebook
+        required: true
+        schema:
+          $ref: '#/definitions/controller.NotebookUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.NotebookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Update a Notebook
+      tags:
+      - notebook
+  /notebook/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of Notebooks
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.NotebooksResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: List Notebooks
+      tags:
+      - notebook
+  /notebook/reset/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Reset a Notebook by its ID
+      parameters:
+      - description: Notebook ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Reset a Notebook
+      tags:
+      - notebook
+  /project:
+    post:
+      consumes:
+      - application/json
+      description: Create a new project with the input payload
+      parameters:
+      - description: Create project
+        in: body
+        name: project
+        required: true
+        schema:
+          $ref: '#/definitions/model.Project'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Project'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Create a new project
+      tags:
+      - projects
+  /project-memberships:
+    post:
+      consumes:
+      - application/json
+      description: Add a user to a project with a specified role
+      parameters:
+      - description: User Project Info
+        in: body
+        name: userProject
+        required: true
+        schema:
+          $ref: '#/definitions/controller.UserProjectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.UserProjectResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Add a user to a project
+      tags:
+      - project-memberships
+  /project-memberships/{projectId}/{userId}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a user from a specified project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: integer
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Remove a user from a project
+      tags:
+      - project-memberships
+    put:
+      consumes:
+      - application/json
+      description: Update the role of a user in a specified project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: integer
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - description: Role Update Info
+        in: body
+        name: roleUpdate
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RoleUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.UpdateUserProjectRoleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Update a user's role in a project
+      tags:
+      - project-memberships
+  /project-memberships/project/{projectId}:
+    get:
+      consumes:
+      - application/json
+      description: Get all members of a specific project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.ProjectsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Get members of a project
+      tags:
+      - project-memberships
+  /project-memberships/user/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Get all projects associated with a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.ProjectsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Get projects for a user
+      tags:
+      - project-memberships
+  /project/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a project by its ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Delete a project
+      tags:
+      - projects
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific project by its ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Project'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Get a project
+      tags:
+      - projects
+    put:
+      consumes:
+      - application/json
+      description: Update a project with the input payload
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update project
+        in: body
+        name: project
+        required: true
+        schema:
+          $ref: '#/definitions/model.Project'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Project'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Update a project
+      tags:
+      - projects
+  /project/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all projects
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Project'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: List all projects
+      tags:
+      - projects
+swagger: "2.0"

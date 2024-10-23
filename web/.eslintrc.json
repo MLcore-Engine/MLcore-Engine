@@ -1,0 +1,29 @@
+{
+    "env": {
+      "browser": true,
+      "es2021": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended"
+    ],
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      "ecmaVersion": 12,
+      "sourceType": "module"
+    },
+    "plugins": [
+      "react"
+    ],
+    "rules": {
+      // 您的自定义规则
+    },
+    "settings": {
+      "react": {
+        "version": "detect",
+        "runtime": "automatic" // **添加这一行**
+      }
+    }
+  }

@@ -1,0 +1,18 @@
+.customConfirmDialog {
+    max-width: 300px !important;
+    margin: auto !important;
+  }
+  
+  .customConfirmDialog :global(.content) {
+    padding: 1.5rem !important;
+    text-align: center !important;
+  }
+  
+  .customConfirmDialog :global(.actions) {
+    text-align: center !important;
+    padding: 1rem !important;
+  }
+  
+  .customConfirmDialog :global(.actions .button) {
+    margin: 0 0.5rem !important;
+  }

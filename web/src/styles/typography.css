@@ -1,0 +1,9 @@
+h1 {
+    font-size: 2rem;
+    color: var(--primary-color);
+  }
+  
+  p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
