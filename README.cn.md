@@ -1,3 +1,6 @@
+<p align="right">
+   <strong>中文</strong> | <a href="./README.md">English</a>
+</p> 
 # 机器学习平台
 
 [![Go Version](https://img.shields.io/badge/Go-1.20+-blue.svg)]()
