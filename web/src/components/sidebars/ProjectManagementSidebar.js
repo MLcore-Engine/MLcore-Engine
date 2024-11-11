@@ -7,6 +7,7 @@ const ProjectManagementSidebar = () => {
   const [openSections, setOpenSections] = useState({
     projectGroup: true,
     userManagement: true,
+    reousrceManage: true,
   });
 
   const isActive = (path) => location.pathname === path;
@@ -53,6 +54,26 @@ const ProjectManagementSidebar = () => {
             <Menu.Item as={Link} to="/project/user_role" active={isActive('/project/user_role')}>
               <Icon name="user circle" />
               用户角色
+            </Menu.Item>
+          </Menu.Menu>
+        )}
+      </Menu.Item>
+
+
+      <Menu.Item>
+        <Menu.Header onClick={() => toggleSection('reousrceManage')} style={{ cursor: 'pointer' }}>
+          <Icon name={openSections.reousrceManage ? 'angle down' : 'angle right'} />
+          资源管理
+        </Menu.Header>
+        {openSections.reousrceManage && (
+          <Menu.Menu>
+            <Menu.Item as={Link} to="/project/resource_gauge" active={isActive('/project/resource_gauge')}>
+              <Icon name="chart bar" />
+              资源统计
+            </Menu.Item>
+            <Menu.Item as={Link} to="/project/project_alloc" active={isActive('/project/project_alloc')}>
+              <Icon name="cubes" /> 
+              资源分配
             </Menu.Item>
           </Menu.Menu>
         )}

@@ -19,9 +19,11 @@ notebook:
   schedule: default-scheduler
   externalIP: 192.168.8.208
   volumes:
-    userWorkspace: kubeflow-user-workspace
-    archives: kubeflow-archives
+    userWorkspace: me-user-workspace
+    archives: me-archives
   defaultPort: 3000
+
+  podType: notebook
 
   
 crds:

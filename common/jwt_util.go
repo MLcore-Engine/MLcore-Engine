@@ -7,7 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-var JWTSecret = []byte("your_jwt_secret_key") // 在实际应用中，应该使用环境变量存储
+var JWTSecret = []byte("my_secret_key_haha") // 在实际应用中，应该使用环境变量存储
 
 type Claims struct {
 	UserId   int    `json:"user_id"`
@@ -23,6 +23,7 @@ func GenerateToken(userId int, username string, role int) (string, error) {
 		Role:     role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			IssuedAt: jwt.NewNumericDate(time.Now()),
 		},
 	}
 

@@ -7,13 +7,13 @@ const NotFound = () => {
     <Container text textAlign='center'>
       <Header as='h1' icon>
         <Icon name='search' />
-        404 - 页面未找到
+        404 - not found
         <Header.Subheader>
-          抱歉,您请求的页面不存在。
+          sorry, the page you requested does not exist.
         </Header.Subheader>
       </Header>
       <Button as={Link} to="/" primary>
-        返回首页
+        back to home
       </Button>
     </Container>
   );

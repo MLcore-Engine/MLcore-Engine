@@ -71,15 +71,16 @@ func Login(c *gin.Context) {
 		return
 	}
 	userWithoutPassword := struct {
-		ID               int    `json:"id"`
-		Username         string `json:"username"`
-		DisplayName      string `json:"display_name"`
-		Role             int    `json:"role"`
-		Status           int    `json:"status"`
-		Email            string `json:"email"`
-		GithubID         string `json:"github_id"`
-		WechatID         string `json:"wechat_id"`
-		VerificationCode string `json:"verification_code"`
+		ID               int             `json:"id"`
+		Username         string          `json:"username"`
+		DisplayName      string          `json:"display_name"`
+		Role             int             `json:"role"`
+		Status           int             `json:"status"`
+		Email            string          `json:"email"`
+		GithubID         string          `json:"github_id"`
+		WechatID         string          `json:"wechat_id"`
+		VerificationCode string          `json:"verification_code"`
+		Projects         []model.Project `json:"projects"`
 	}{
 		ID:               int(user.ID),
 		Username:         user.Username,
@@ -90,6 +91,7 @@ func Login(c *gin.Context) {
 		GithubID:         user.GitHubID,
 		WechatID:         user.WeChatID,
 		VerificationCode: user.VerificationCode,
+		Projects:         user.Projects,
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -101,7 +103,6 @@ func Login(c *gin.Context) {
 		},
 	})
 
-	// setupLogin(&user, c)
 }
 
 func Logout(c *gin.Context) {
@@ -191,11 +192,19 @@ func Register(c *gin.Context) {
 }
 
 func GetAllUsers(c *gin.Context) {
-	p, _ := strconv.Atoi(c.Query("p"))
-	if p < 0 {
-		p = 0
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+	if page < 1 {
+		page = 1
 	}
-	users, err := model.GetAllUsers(p*common.ItemsPerPage, common.ItemsPerPage)
+
+	if limit < 1 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
+	users, total, err := model.GetAllUsers(offset, limit)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -206,14 +215,42 @@ func GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    users,
+		"data": gin.H{
+			"users": users,
+			"total": total,
+			"page":  page,
+			"limit": limit,
+		},
 	})
-	return
 }
 
 func SearchUsers(c *gin.Context) {
+	// 获取搜索参数
 	keyword := c.Query("keyword")
-	users, err := model.SearchUsers(keyword)
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+	// 参数验证
+	if keyword == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "Search keyword cannot be empty",
+		})
+		return
+	}
+
+	// 参数保护
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+
+	// 计算偏移量
+	offset := (page - 1) * limit
+
+	users, total, err := model.SearchUsers(keyword, offset, limit)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -221,12 +258,17 @@ func SearchUsers(c *gin.Context) {
 		})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    users,
+		"data": gin.H{
+			"users": users,
+			"total": total,
+			"page":  page,
+			"limit": limit,
+		},
 	})
-	return
 }
 
 func GetUser(c *gin.Context) {

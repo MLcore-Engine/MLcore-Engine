@@ -28,7 +28,7 @@ func CreateProject(c *gin.Context) {
 	}
 
 	if err := model.DB.Create(&project).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create project"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed create project: " + err.Error()})
 		return
 	}
 

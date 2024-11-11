@@ -11,7 +11,7 @@ import {
   Segment,
 } from 'semantic-ui-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useUser } from '../context/User';
+import { useAuth } from '../context/AuthContext';
 import { API, showError, showSuccess } from '../helpers';
 
 
@@ -54,7 +54,7 @@ const LoginForm = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [submitted, setSubmitted] = useState(false);
   const { username, password } = inputs;
-  const { login } = useUser();
+  const { login } = useAuth();
   let navigate = useNavigate();
 
   const [status, setStatus] = useState({});
@@ -93,7 +93,7 @@ const LoginForm = () => {
       localStorage.setItem('token', data.token);
       API.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
       navigate('/');
-      showSuccess('登录成功！');
+      showSuccess('Login success！');
       setShowWeChatLoginModal(false);
     } else {
       showError(message);
@@ -125,8 +125,8 @@ const LoginForm = () => {
         // 设置 API 请求的默认 Authorization header
         API.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         // navigate('/');
-        navigate('/dashboard');
-        showSuccess('登录成功！');
+        navigate('/');
+        showSuccess('Login success！');
       } else {
         showError(message);
       }

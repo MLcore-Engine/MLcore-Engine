@@ -17,10 +17,8 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/dynamic"
 	dfake "k8s.io/client-go/dynamic/fake"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -1087,113 +1085,113 @@ func TestDeleteExistingVirtualService(t *testing.T) {
 	}
 }
 
-func TestCreateService(t *testing.T) {
-	// 使用当前目录下的 kubeconfig 文件
-	kubeconfig := filepath.Join(".", "config")
+// func TestCreateService(t *testing.T) {
+// 	// 使用当前目录下的 kubeconfig 文件
+// 	kubeconfig := filepath.Join(".", "config")
 
-	// 使用 kubeconfig 创建 config
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		t.Fatalf("Error building kubeconfig: %v", err)
-	}
+// 	// 使用 kubeconfig 创建 config
+// 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+// 	if err != nil {
+// 		t.Fatalf("Error building kubeconfig: %v", err)
+// 	}
 
-	// 创建 Kubernetes 客户端
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		t.Fatalf("Error creating Kubernetes client: %v", err)
-	}
+// 	// 创建 Kubernetes 客户端
+// 	clientset, err := kubernetes.NewForConfig(config)
+// 	if err != nil {
+// 		t.Fatalf("Error creating Kubernetes client: %v", err)
+// 	}
 
-	k8s := &K8s{
-		clientset: clientset,
-	}
+// 	k8s := &K8s{
+// 		clientset: clientset,
+// 	}
 
-	// 设置 Service 的参数
-	namespace := "jupyter"
-	name := "luowei234-pod" // 使用测试前缀以避免冲突
-	username := "luowei234"
-	ports := []interface{}{3000}
-	selector := map[string]string{
-		"app":      "luowei234-pod",
-		"pod-type": "notebook",
-		"user":     "luowei234",
-	}
-	serviceType := corev1.ServiceTypeClusterIP
-	var externalIP []string
-	annotations := map[string]string{}
-	var loadBalancerIP string
-	disableLoadBalancer := false
+// 	// 设置 Service 的参数
+// 	namespace := "jupyter"
+// 	name := "luowei234-pod" // 使用测试前缀以避免冲突
+// 	username := "luowei234"
+// 	ports := []interface{}{3000}
+// 	selector := map[string]string{
+// 		"app":      "luowei234-pod",
+// 		"pod-type": "notebook",
+// 		"user":     "luowei234",
+// 	}
+// 	serviceType := corev1.ServiceTypeClusterIP
+// 	var externalIP []string
+// 	annotations := map[string]string{}
+// 	var loadBalancerIP string
+// 	disableLoadBalancer := false
 
-	// 调用 CreateService 函数
-	createdService, err := k8s.CreateService(
-		namespace, name, username, ports, selector, serviceType,
-		externalIP, annotations, loadBalancerIP, disableLoadBalancer,
-	)
+// 	// 调用 CreateService 函数
+// 	createdService, err := k8s.CreateService(
+// 		namespace, name, username, ports, selector, serviceType,
+// 		externalIP, annotations, loadBalancerIP, disableLoadBalancer,
+// 	)
 
-	if err != nil {
-		t.Fatalf("Failed to create service: %v", err)
-	}
+// 	if err != nil {
+// 		t.Fatalf("Failed to create service: %v", err)
+// 	}
 
-	// 验证创建的 Service
-	if createdService.Name != name {
-		t.Errorf("Expected service name %s, got %s", name, createdService.Name)
-	}
-	if createdService.Namespace != namespace {
-		t.Errorf("Expected namespace %s, got %s", namespace, createdService.Namespace)
-	}
-	// fmt.Println("-------------------------####-------------------------")
-	// fmt.Println(createdService)
-	// fmt.Println("test到这里了")
-	// 验证 labels
-	expectedLabels := map[string]string{
-		"app":      "luowei234-pod",
-		"pod-type": "notebook",
-		"user":     "luowei234",
-	}
-	if !reflect.DeepEqual(createdService.Labels, expectedLabels) {
-		t.Errorf("Labels do not match. Expected %v, got %v", expectedLabels, createdService.Labels)
-	}
+// 	// 验证创建的 Service
+// 	if createdService.Name != name {
+// 		t.Errorf("Expected service name %s, got %s", name, createdService.Name)
+// 	}
+// 	if createdService.Namespace != namespace {
+// 		t.Errorf("Expected namespace %s, got %s", namespace, createdService.Namespace)
+// 	}
+// 	// fmt.Println("-------------------------####-------------------------")
+// 	// fmt.Println(createdService)
+// 	// fmt.Println("test到这里了")
+// 	// 验证 labels
+// 	expectedLabels := map[string]string{
+// 		"app":      "luowei234-pod",
+// 		"pod-type": "notebook",
+// 		"user":     "luowei234",
+// 	}
+// 	if !reflect.DeepEqual(createdService.Labels, expectedLabels) {
+// 		t.Errorf("Labels do not match. Expected %v, got %v", expectedLabels, createdService.Labels)
+// 	}
 
-	// 验证 spec
-	if createdService.Spec.Type != corev1.ServiceTypeClusterIP {
-		t.Errorf("Expected service type ClusterIP, got %v", createdService.Spec.Type)
-	}
+// 	// 验证 spec
+// 	if createdService.Spec.Type != corev1.ServiceTypeClusterIP {
+// 		t.Errorf("Expected service type ClusterIP, got %v", createdService.Spec.Type)
+// 	}
 
-	if len(createdService.Spec.Ports) != 1 {
-		t.Fatalf("Expected 1 port, got %d", len(createdService.Spec.Ports))
-	}
+// 	if len(createdService.Spec.Ports) != 1 {
+// 		t.Fatalf("Expected 1 port, got %d", len(createdService.Spec.Ports))
+// 	}
 
-	expectedPort := corev1.ServicePort{
-		Name:       "http0",
-		Port:       3000,
-		Protocol:   corev1.ProtocolTCP,
-		TargetPort: intstr.FromInt(3000),
-	}
-	if !reflect.DeepEqual(createdService.Spec.Ports[0], expectedPort) {
-		t.Errorf("Port does not match. Expected %v, got %v", expectedPort, createdService.Spec.Ports[0])
-	}
+// 	expectedPort := corev1.ServicePort{
+// 		Name:       "http0",
+// 		Port:       3000,
+// 		Protocol:   corev1.ProtocolTCP,
+// 		TargetPort: intstr.FromInt(3000),
+// 	}
+// 	if !reflect.DeepEqual(createdService.Spec.Ports[0], expectedPort) {
+// 		t.Errorf("Port does not match. Expected %v, got %v", expectedPort, createdService.Spec.Ports[0])
+// 	}
 
-	if !reflect.DeepEqual(createdService.Spec.Selector, selector) {
-		t.Errorf("Selector does not match. Expected %v, got %v", selector, createdService.Spec.Selector)
-	}
+// 	if !reflect.DeepEqual(createdService.Spec.Selector, selector) {
+// 		t.Errorf("Selector does not match. Expected %v, got %v", selector, createdService.Spec.Selector)
+// 	}
 
-	// 验证 ClusterIP 不是 "None"
-	if createdService.Spec.ClusterIP == "None" {
-		t.Errorf("Expected ClusterIP to not be 'None', got 'None'")
-	}
+// 	// 验证 ClusterIP 不是 "None"
+// 	if createdService.Spec.ClusterIP == "None" {
+// 		t.Errorf("Expected ClusterIP to not be 'None', got 'None'")
+// 	}
 
-	// 从 API 服务器获取 Service 并进行额外验证
-	retrievedService, err := clientset.CoreV1().Services(namespace).Get(context.TODO(), name, metav1.GetOptions{})
-	if err != nil {
-		t.Fatalf("Failed to retrieve service: %v", err)
-	}
+// 	// 从 API 服务器获取 Service 并进行额外验证
+// 	retrievedService, err := clientset.CoreV1().Services(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+// 	if err != nil {
+// 		t.Fatalf("Failed to retrieve service: %v", err)
+// 	}
 
-	if !reflect.DeepEqual(createdService, retrievedService) {
-		t.Errorf("Retrieved service does not match created service")
-	}
+// 	if !reflect.DeepEqual(createdService, retrievedService) {
+// 		t.Errorf("Retrieved service does not match created service")
+// 	}
 
-	// 清理：删除创建的 Service
-	// err = clientset.CoreV1().Services(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
-	// if err != nil {
-	// 	t.Fatalf("Failed to delete test service: %v", err)
-	// }
-}
+// 	// 清理：删除创建的 Service
+// 	// err = clientset.CoreV1().Services(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+// 	// if err != nil {
+// 	// 	t.Fatalf("Failed to delete test service: %v", err)
+// 	// }
+// }

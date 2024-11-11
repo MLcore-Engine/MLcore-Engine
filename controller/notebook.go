@@ -4,10 +4,10 @@ import (
 	"MLcore-Engine/common"
 	"MLcore-Engine/model"
 	"MLcore-Engine/services"
-	"context"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +16,6 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 // CreateNotebook godoc
@@ -31,24 +30,26 @@ import (
 // @Failure 500 {object} ErrorResponse
 // @Router /notebook [post]
 func CreateNotebook(c *gin.Context) {
+
 	username := c.GetString("username")
 	var notebook model.Notebook
 	if err := c.ShouldBindJSON(&notebook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid request payload: " + err.Error(),
+			"data":    nil,
 		})
 		return
 	}
 
-	// Set Notebook basic information
-	setNotebookDefaults(&notebook, username)
+	notebook.Name = username + "-" + common.GenRandStr(5)
+	notebook.Namespace = viper.GetString("notebook.namespace")
 
-	// Insert Notebook into database
 	if err := notebook.Insert(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "Failed to insert Notebook: " + err.Error(),
+			"data":    nil,
 		})
 		return
 	}
@@ -59,28 +60,30 @@ func CreateNotebook(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "Failed to create K8s client: " + err.Error(),
+			"data":    nil,
 		})
 		return
 	}
 
 	labels := map[string]string{
 		"app":      notebook.Name,
-		"pod-type": "notebook",
+		"pod-type": viper.GetString("notebook.podType"),
 		"user":     username,
 	}
 
 	// Create Pod
-	createdPod, err := createPodForNotebook(k8sClient, &notebook, username, labels)
+	createdPod, err := createPodForNotebook(k8sClient, &notebook, labels)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "Failed to create Pod: " + err.Error(),
+			"data":    nil,
 		})
 		return
 	}
 
 	// Create Service
-	_, err = createServiceForNotebook(k8sClient, &notebook, labels)
+	createdService, err := createServiceForNotebook(k8sClient, &notebook, labels)
 	if err != nil {
 		// If Service creation fails, delete the created Pod
 		_ = k8sClient.DeletePod(notebook.Namespace, createdPod.Name)
@@ -91,16 +94,9 @@ func CreateNotebook(c *gin.Context) {
 		return
 	}
 
-	_, err = createVsForNotebook(k8sClient, &notebook, username)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Failed to create VirtualService: " + err.Error(),
-		})
-		return
-	}
+	nodeport := createdService.Spec.Ports[0].NodePort
+	notebook.AccessURL = fmt.Sprintf("http://%s:%d/lab?#%s", viper.GetString("notebook.externalIP"), nodeport, notebook.Name)
 
-	// Update Notebook status
 	notebook.Status = "Creating"
 	notebook.Name = createdPod.Name
 
@@ -114,8 +110,10 @@ func CreateNotebook(c *gin.Context) {
 
 	simplifiedPodInfo := gin.H{
 		"Id":             notebook.ID,
+		"UserId":         notebook.UserID,
+		"ProjectId":      notebook.ProjectID,
 		"Name":           createdPod.Name,
-		"Describe":       fmt.Sprintf("Notebook for user %s", username),
+		"Describe":       fmt.Sprintf("Notebook for user %s", notebook.User.Username),
 		"ResourceMemory": notebook.ResourceMemory,
 		"ResourceCPU":    notebook.ResourceCPU,
 		"ResourceGPU":    notebook.ResourceGPU,
@@ -126,51 +124,39 @@ func CreateNotebook(c *gin.Context) {
 		"success": true,
 		"message": "Notebook and Service created successfully",
 		"data": gin.H{
-			"pod": simplifiedPodInfo,
+			"notebook": simplifiedPodInfo,
 		},
 	})
 }
 
-// setNotebookDefaults sets default values for a Notebook
-func setNotebookDefaults(notebook *model.Notebook, username string) {
-	notebook.Namespace = viper.GetString("notebook.namespace")
-	notebook.Name = username
-	notebook.AccessURL = fmt.Sprintf("http://%s/notebook/%s/%s/lab?#%s",
-		viper.GetString("notebook.externalIP"), notebook.Namespace, notebook.Name, "mnt/"+username)
-}
-
 // createPodForNotebook creates a Pod for the Notebook
-func createPodForNotebook(k8sClient *services.K8s, notebook *model.Notebook, username string, labels map[string]string) (*corev1.Pod, error) {
+func createPodForNotebook(k8sClient *services.K8s, notebook *model.Notebook, labels map[string]string) (*corev1.Pod, error) {
+
 	command := []string{"sh", "-c"}
-	argTemplate := `jupyter lab --notebook-dir=/mnt/%s --ip=0.0.0.0 --no-browser --allow-root --port=3000 --NotebookApp.token='' --NotebookApp.password='' --ServerApp.disable_check_xsrf=True --NotebookApp.allow_origin='*' --NotebookApp.base_url=/notebook/jupyter/%s/ --NotebookApp.tornado_settings='{"headers": {"Content-Security-Policy": "frame-ancestors * 'self' "}}'`
-	args := []string{fmt.Sprintf(argTemplate, username, username)}
+	argTemplate := `jupyter lab --notebook-dir=/mnt/%s --ip=0.0.0.0 --no-browser --allow-root --port=3000 --NotebookApp.token='' --NotebookApp.password='' --ServerApp.disable_check_xsrf=True --NotebookApp.allow_origin='*' --NotebookApp.tornado_settings='{"headers": {"Content-Security-Policy": "frame-ancestors * 'self' "}}'`
+	args := []string{fmt.Sprintf(argTemplate, notebook.Name)}
 
 	userWorkspaceVolume := viper.GetString("notebook.volumes.userWorkspace")
-	archivesVolume := viper.GetString("notebook.volumes.archives")
 
 	volumeMounts := []corev1.VolumeMount{
-		{Name: userWorkspaceVolume, MountPath: fmt.Sprintf("/mnt/%s", username), SubPath: username},
-		{Name: archivesVolume, MountPath: fmt.Sprintf("/archives/%s", username), SubPath: username},
+		{Name: userWorkspaceVolume, MountPath: fmt.Sprintf("/mnt/%s", notebook.Name), SubPath: notebook.Name},
 		{Name: "tz-config", MountPath: "/etc/localtime"},
-		{Name: "dshm", MountPath: "/dev/shm"},
 	}
 
 	volumes := []corev1.Volume{
 		{Name: userWorkspaceVolume, VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: userWorkspaceVolume}}},
-		{Name: archivesVolume, VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: archivesVolume}}},
 		{Name: "tz-config", VolumeSource: corev1.VolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: "/etc/localtime"}}},
-		{Name: "dshm", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{Medium: corev1.StorageMediumMemory}}},
 	}
 
 	env := []corev1.EnvVar{
 		{Name: "NO_AUTH", Value: "true"},
-		{Name: "USERNAME", Value: username},
+		{Name: "USERNAME", Value: strings.Split(notebook.Name, "-")[0]},
 		{Name: "NODE_OPTIONS", Value: "--max-old-space-size=4096"},
-		{Name: "K8S_NODE_NAME", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "spec.nodeName"}}},
-		{Name: "K8S_POD_NAMESPACE", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "metadata.namespace"}}},
-		{Name: "K8S_POD_IP", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "status.podIP"}}},
-		{Name: "K8S_HOST_IP", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "status.hostIP"}}},
-		{Name: "K8S_POD_NAME", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "metadata.name"}}},
+		// 	{Name: "K8S_NODE_NAME", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "spec.nodeName"}}},
+		// 	{Name: "K8S_POD_NAMESPACE", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "metadata.namespace"}}},
+		// 	{Name: "K8S_POD_IP", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "status.podIP"}}},
+		// 	{Name: "K8S_HOST_IP", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "status.hostIP"}}},
+		// 	{Name: "K8S_POD_NAME", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "metadata.name"}}},
 	}
 
 	pod := &corev1.Pod{
@@ -184,13 +170,13 @@ func createPodForNotebook(k8sClient *services.K8s, notebook *model.Notebook, use
 			Containers: []corev1.Container{
 				{
 					Name:            notebook.Name,
-					Image:           viper.GetString("notebook.image.notebookcpu"),
+					Image:           notebook.Image,
 					Command:         command,
 					Args:            args,
-					WorkingDir:      fmt.Sprintf("/mnt/%s", username),
+					WorkingDir:      fmt.Sprintf("/mnt/%s", notebook.Name),
 					VolumeMounts:    volumeMounts,
 					Env:             env,
-					ImagePullPolicy: corev1.PullIfNotPresent,
+					ImagePullPolicy: corev1.PullPolicy(notebook.ImagePullPolicy),
 					Resources: corev1.ResourceRequirements{
 						Limits: corev1.ResourceList{
 							corev1.ResourceMemory: resource.MustParse(notebook.ResourceMemory),
@@ -213,9 +199,6 @@ func createPodForNotebook(k8sClient *services.K8s, notebook *model.Notebook, use
 			SchedulerName:      viper.GetString("notebook.schedule"),
 		},
 	}
-	pod.ObjectMeta.ResourceVersion = ""
-	pod.ObjectMeta.UID = ""
-	pod.ObjectMeta.CreationTimestamp = metav1.Time{}
 
 	return k8sClient.CreatePod(notebook.Namespace, pod)
 }
@@ -226,10 +209,27 @@ func createServiceForNotebook(k8sClient *services.K8s, notebook *model.Notebook,
 	return k8sClient.CreateServiceForNotebook(notebook.Namespace, notebook.Name, port, labels)
 }
 
-// createVsForNotebook creates a VirtualService for the Notebook
-func createVsForNotebook(k8sClient *services.K8s, notebook *model.Notebook, username string) (*unstructured.Unstructured, error) {
-	port := viper.GetInt("notebook.defaultPort")
-	return k8sClient.CreateVirtualService(notebook.Namespace, notebook.Name, "*", username, int32(port))
+func createNotebookResources(k8sClient *services.K8s, notebook *model.Notebook) (*corev1.Pod, *corev1.Service, error) {
+
+	labels := map[string]string{
+		"app":      notebook.Name,
+		"pod-type": "notebook",
+		"user":     strings.Split(notebook.Name, "-")[0],
+	}
+
+	// Create Pod
+	createdPod, err := createPodForNotebook(k8sClient, notebook, labels)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create Pod: %v", err)
+	}
+
+	// Create Service
+	createdService, err := createServiceForNotebook(k8sClient, notebook, labels)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create Service: %v", err)
+	}
+
+	return createdPod, createdService, nil
 }
 
 // DeleteNotebook godoc
@@ -245,12 +245,14 @@ func createVsForNotebook(k8sClient *services.K8s, notebook *model.Notebook, user
 // @Failure 500 {object} ErrorResponse
 // @Router /notebook/{id} [delete]
 func DeleteNotebook(c *gin.Context) {
+
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": "Invalid id parameter",
+			"data":    nil,
 		})
 		return
 	}
@@ -260,10 +262,11 @@ func DeleteNotebook(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"success": false,
 			"message": "Notebook not found",
+			"data":    nil,
 		})
 		return
 	}
-	// Create K8s client
+	// Create K8s client todo
 	k8sClient, err := services.NewK8s("./services/config")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -285,6 +288,7 @@ func DeleteNotebook(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": err.Error(),
+			"data":    nil,
 		})
 		return
 	}
@@ -292,6 +296,7 @@ func DeleteNotebook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Notebook deleted successfully",
+		"data":    nil,
 	})
 }
 
@@ -347,68 +352,52 @@ func GetNotebook(c *gin.Context) {
 // @Failure 401 {object} ErrorResponse
 // @Router /notebook/get-all [get]
 func ListNotebooks(c *gin.Context) {
-	// Get current user information
-	role, exists := c.Get("role")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"message": "User not authenticated1",
-		})
-		return
-	}
-	id, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"message": "User not authenticated2",
-		})
-		return
-	}
-	userId, ok := id.(int)
-	if !ok {
-		// Handle type assertion failure
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "Invalid user ID",
-		})
-		return
-	}
-
 	// Get pagination parameters
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	if page < 1 {
-		page = 1
-	}
-	pageSize := common.ItemsPerPage
-	offset := (page - 1) * pageSize
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	offset := (page - 1) * limit
 
+	// Get user role and ID
+	role, exists := c.Get("role")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "User not authenticated"})
+		return
+	}
 	var notebooks []model.Notebook
 	var total int64
-	var err error
+	query := model.DB.Model(&model.Notebook{}).Preload("User")
 
-	// Get notebooks based on user role
-	if role == 10 || role == 100 {
-		notebooks, total, err = model.GetAllNotebooksPaginated(offset, pageSize)
-	} else {
-		notebooks, total, err = model.GetUserNotebooksPaginated(userId, offset, pageSize)
+	// Filter by user if not root
+	if role != 100 {
+		userId, exists := c.Get("user_id")
+		fmt.Println("userId: ", userId)
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "User not authenticated"})
+			return
+		}
+		query = query.Where("user_id = ?", userId)
 	}
 
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": err.Error(),
-		})
+	// Get total count
+	if err := query.Count(&total).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to count notebooks"})
+		return
+	}
+
+	// Get paginated notebooks
+	if err := query.Offset(offset).Limit(limit).Find(&notebooks).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to retrieve notebooks"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "",
 		"data": gin.H{
 			"notebooks": notebooks,
 			"total":     total,
 			"page":      page,
-			"pageSize":  pageSize,
+			"limit":     limit,
 		},
 	})
 }
@@ -426,12 +415,15 @@ func ListNotebooks(c *gin.Context) {
 // @Failure 500 {object} ErrorResponse
 // @Router /notebook/reset/{id} [post]
 func ResetNotebook(c *gin.Context) {
+
+	common.SysLog("ResetNotebook")
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid id parameter",
+			"data":    nil,
 		})
 		return
 	}
@@ -442,6 +434,7 @@ func ResetNotebook(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"success": false,
 			"message": "Notebook not found!",
+			"data":    nil,
 		})
 		return
 	}
@@ -466,15 +459,8 @@ func ResetNotebook(c *gin.Context) {
 	}
 
 	// Delete the notebook from the database
-	existingNotebook.Status = "Resetting"
-	existingNotebook.UpdatedAt = time.Now()
-	if err := existingNotebook.Update(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Failed to update notebook in database: " + err.Error(),
-		})
-		return
-	}
+	// existingNotebook.Status = "Resetting"
+
 	// Create a new notebook with the same information
 	newNotebook := *existingNotebook
 	newNotebook.ID = 0 // Reset ID for new insertion
@@ -482,13 +468,32 @@ func ResetNotebook(c *gin.Context) {
 	newNotebook.UpdatedAt = time.Now()
 
 	// Create new Kubernetes resources
-	if err := createNotebookResources(k8sClient, &newNotebook); err != nil {
+	_, createdService, err := createNotebookResources(k8sClient, &newNotebook)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "Failed to create new resources: " + err.Error(),
+			"data":    nil,
 		})
 		return
 	}
+	nodeport := createdService.Spec.Ports[0].NodePort
+	existingNotebook.AccessURL = fmt.Sprintf("http://%s:%d/lab?#%s", viper.GetString("notebook.externalIP"), nodeport, existingNotebook.Name)
+	existingNotebook.UpdatedAt = time.Now()
+	if err := existingNotebook.Update(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Failed to update notebook in database: " + err.Error(),
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Notebook reset successfully",
+		"data":    nil,
+	})
 }
 
 type NotebookUpdateRequest struct {
@@ -637,7 +642,6 @@ func updatePodSpec(pod *corev1.Pod, updateReq *NotebookUpdateRequest) {
 	}
 }
 func deleteNotebookResources(k8sClient *services.K8s, notebook *model.Notebook) error {
-	ctx := context.Background()
 
 	// Delete Pod
 	err := k8sClient.DeletePod(notebook.Namespace, notebook.Name)
@@ -652,40 +656,10 @@ func deleteNotebookResources(k8sClient *services.K8s, notebook *model.Notebook) 
 	}
 
 	// Delete VirtualService
-	err = k8sClient.DeleteVirtualService(ctx, notebook.Namespace, notebook.Name)
-	if err != nil && !k8serrors.IsNotFound(err) {
-		return fmt.Errorf("failed to delete VirtualService: %v", err)
-	}
-
-	return nil
-}
-
-func createNotebookResources(k8sClient *services.K8s, notebook *model.Notebook) error {
-	username := notebook.Name // Assuming the notebook name is the username
-
-	labels := map[string]string{
-		"app":      notebook.Name,
-		"pod-type": "notebook",
-		"user":     username,
-	}
-
-	// Create Pod
-	_, err := createPodForNotebook(k8sClient, notebook, username, labels)
-	if err != nil {
-		return fmt.Errorf("failed to create Pod: %v", err)
-	}
-
-	// Create Service
-	_, err = createServiceForNotebook(k8sClient, notebook, labels)
-	if err != nil {
-		return fmt.Errorf("failed to create Service: %v", err)
-	}
-
-	// Create VirtualService
-	_, err = createVsForNotebook(k8sClient, notebook, username)
-	if err != nil {
-		return fmt.Errorf("failed to create VirtualService: %v", err)
-	}
+	// err = k8sClient.DeleteVirtualService(ctx, notebook.Namespace, notebook.Name)
+	// if err != nil && !k8serrors.IsNotFound(err) {
+	// 	return fmt.Errorf("failed to delete VirtualService: %v", err)
+	// }
 
 	return nil
 }

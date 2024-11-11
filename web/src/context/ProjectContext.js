@@ -15,9 +15,7 @@ export const ProjectProvider = ({ children }) => {
   
   // projects model state with users
   const [projects, setProjects] = useState([]);
-
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   /***************************** Project Members API *****************************/
   // Fetch all projects
@@ -66,7 +64,6 @@ export const ProjectProvider = ({ children }) => {
   
   const addProjectMember = async (projectId, member) => {
     setLoading(true);
-    setError(null);
     try {
       const newMember = await projectAPI.addProjectMember(projectId, member);
       setProjects((prevProjects) =>
@@ -76,11 +73,11 @@ export const ProjectProvider = ({ children }) => {
             : project
         )
       );
-      toast.success('Member added successfully.');
+      toast.info('Member added successfully.');
     } catch (err) {
-      setError(err.message);
+      console.error("API Error in addProjectMember: ", err);
       toast.error(err.message || 'Failed to add member.');
-      throw err;
+      // throw err;
     } finally {
       setLoading(false);
     }
@@ -90,7 +87,7 @@ export const ProjectProvider = ({ children }) => {
   // remove project member
   const removeProjectMember = async (projectId, memberId) => {
     setLoading(true);
-    setError(null);
+    // setError(null);
     try {
       await projectAPI.removeProjectMember(projectId, memberId);
       setProjects((prevProjects) =>
@@ -103,11 +100,11 @@ export const ProjectProvider = ({ children }) => {
             : project
         )
       );
-      toast.success('Member removed successfully.');
+      toast.info('Member removed successfully.');
     } catch (err) {
-      setError(err.message);
+      console.error("API Error in removeProjectMember: ", err);
       toast.error(err.message || 'Failed to remove member.');
-      throw err;
+      // throw err;
     } finally {
       setLoading(false);
     }
@@ -115,7 +112,7 @@ export const ProjectProvider = ({ children }) => {
 
   const updateProjectMemberRole = async (projectId, memberId, role) => {
     setLoading(true);
-    setError(null);
+    // setError(null);
     try {
       const updatedMember = await projectAPI.updateUserProjectRole(projectId, memberId, role);
       setProjects((prevProjects) =>
@@ -132,9 +129,9 @@ export const ProjectProvider = ({ children }) => {
       );
       toast.success('Member role updated successfully.');
     } catch (err) {
-      setError(err.message);
+      console.error("API Error in updateProjectMemberRole: ", err);
       toast.error(err.message || 'Failed to update member role.');
-      throw err;
+      // throw err;
     } finally {
       setLoading(false);
     }
@@ -145,14 +142,14 @@ export const ProjectProvider = ({ children }) => {
   // create project
   const createProject = async (projectData) => {
     setLoading(true);
-    setError(null);
+    // setError(null);
     try {
       const newProject = await projectAPI.createProject(projectData);
       setProjects((prevProjects) => [...prevProjects, newProject]);
     } catch (err) {
-      setError(err.message);
-      toast.error(err.message || 'Failed to create project.');
-      throw err;
+      console.error("API Error in createProject: ", err);
+      // toast.error(err.message || 'Failed to create project.');
+      throw err; 
     } finally {
       setLoading(false);
     }
@@ -161,7 +158,7 @@ export const ProjectProvider = ({ children }) => {
   // update an existingproject
   const updateProject = async (projectId, projectData) => {
     setLoading(true);
-    setError(null);
+    // setError(null);
     try {
       const updatedProject = await projectAPI.updateProject(projectId, projectData);
       setProjects((prevProjects) =>
@@ -170,8 +167,8 @@ export const ProjectProvider = ({ children }) => {
         )
       );
     } catch (err) {
-      setError(err.message);
-      toast.error(err.message || 'Failed to update project.');
+      // setError(err.message);  
+      console.error('Error in createProject:', err);
       throw err;
     } finally {
       setLoading(false);
@@ -181,15 +178,13 @@ export const ProjectProvider = ({ children }) => {
   // delete a project
   const deleteProject = async (projectId) => {
     setLoading(true);
-    setError(null);
     try {
       await projectAPI.deleteProject(projectId);
       setProjects((prevProjects) =>
         prevProjects.filter((project) => project.ID !== projectId)
       );
     } catch (err) {
-      setError(err.message);
-      toast.error(err.message || 'Failed to delete project.');
+      console.error("API Error in deleteProject: ", err);
       throw err;
     } finally {
       setLoading(false);
@@ -205,7 +200,7 @@ export const ProjectProvider = ({ children }) => {
   const value = {
     projects,
     loading,
-    error,
+    // error,
     fetchProjects,
     addProjectMember,
     removeProjectMember,

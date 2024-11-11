@@ -8,7 +8,6 @@ const ProjectGroupOrg = () => {
   const {
     projects,
     loading,
-    error,
     createProject,
     updateProject,
     deleteProject,
@@ -18,6 +17,9 @@ const ProjectGroupOrg = () => {
   const [modalType, setModalType] = useState('');
   const [projectData, setProjectData] = useState({ name: '', description: '' });
   const [modalError, setModalError] = useState('');
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   const handleAdd = () => {
     setModalType('add');
@@ -34,23 +36,25 @@ const ProjectGroupOrg = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (item) => {
     try {
-      await deleteProject(id);
-      toast.success('Project deleted successfully.');
+      await deleteProject(item.ID);
+      toast.info('project deleted');
     } catch (err) {
       console.error(err.message);
-      toast.error(err.message || 'Failed to delete project.');
+      toast.error(err.message || 'delete project failed');
     }
   };
 
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
-
   const handleSubmit = async () => {
-    if (!projectData.name) {
-      setModalError('项目名称不能为空');
+    if (!projectData.name.trim()) {
+      setModalError('project name is required');  
       return;
     }
+
+    setIsSubmitting(true);
+    setModalError('');
+
     try {
       if (modalType === 'add') {
         await createProject(projectData);
@@ -62,28 +66,37 @@ const ProjectGroupOrg = () => {
       setSelectedProjectId(null);
       setModalError('');
     } catch (err) {
-      setModalError(err.message);
+      setModalError(err.message || 'operation failed');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const columns = ['name', 'description'];
+  const columnNames = { name: '项目名称', description: '描述' };
 
-  if (loading) return <div>加载中...</div>;
-  if (error) return <div>错误: {error}</div>;
+  if (loading) return <div className='p-4'>loading...</div>;
 
   return (
-    <div>
+    <div className='p-4'>
       <DataList
-        title="项目管理"
-        data={projects}
+        title="Project List"
+        data={projects || []}
         columns={columns}
+        columnNames={columnNames}
         onAdd={handleAdd}
         onEdit={handleEdit}
-        onDelete={(project) => handleDelete(project.ID)}
+        onDelete={handleDelete}
       />
 
-      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <Modal.Header>{modalType === 'add' ? '添加项目' : '编辑项目'}</Modal.Header>
+      <Modal
+              open={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              closeOnDimmerClick={!isSubmitting}
+              closeOnEscape={!isSubmitting}
+              aria-labelledby="modal-header"
+      >
+        <Modal.Header id="modal-header">{modalType === 'add' ? '添加项目' : '编辑项目'}</Modal.Header>
         <Modal.Content>
           <Form error={!!modalError}>
             <Form.Input
@@ -91,19 +104,34 @@ const ProjectGroupOrg = () => {
               value={projectData.name}
               onChange={(e, { value }) => setProjectData({ ...projectData, name: value })}
               placeholder="输入项目名称"
+              aria-label="project-name"
+              required
             />
             <Form.TextArea
               label="描述"
               value={projectData.description}
               onChange={(e, { value }) => setProjectData({ ...projectData, description: value })}
               placeholder="输入项目描述"
+              aria-label="project-description"
             />
             {modalError && <Message error content={modalError} />}
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button onClick={() => setIsModalOpen(false)}>取消</Button>
-          <Button primary onClick={handleSubmit}>
+          <Button 
+            onClick={() => setIsModalOpen(false)}
+            disabled={isSubmitting}
+            aria-label="cancel-button"
+          >
+            取消
+          </Button>
+          <Button 
+            primary 
+            onClick={handleSubmit}
+            loading={isSubmitting}
+            disabled={isSubmitting}
+            aria-label={modalType === 'add' ? '添加' : '保存'}
+          >
             {modalType === 'add' ? '添加' : '保存'}
           </Button>
         </Modal.Actions>

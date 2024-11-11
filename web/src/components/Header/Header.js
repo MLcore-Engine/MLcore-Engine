@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useUser } from '../../context/User';
+import { useAuth } from '../../context/AuthContext';
 import { GIT_REPO_URL } from '../../constants/common.constant';
 import { Menu, Dropdown, Icon, Container } from 'semantic-ui-react';
 import { getSystemName, isAdmin } from '../../helpers';
@@ -25,7 +25,7 @@ const headerButtons = [
   },
   {
     name: '模型训练',
-    to: '/train',
+    to: '/training',
     icon: 'cogs',
   },
   {
@@ -41,7 +41,7 @@ const headerButtons = [
 ];
 
 const Header = () => {
-  const { user, logout } = useUser();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const systemName = getSystemName();
 

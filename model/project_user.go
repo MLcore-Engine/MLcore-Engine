@@ -12,13 +12,13 @@ const (
 )
 
 type UserProject struct {
-	UserID    uint      `json:"userId" gorm:"primaryKey"`
-	ProjectID uint      `json:"projectId" gorm:"primaryKey"`
+	UserID    uint      `json:"user_id" gorm:"primaryKey"`
+	ProjectID uint      `json:"project_id" gorm:"primaryKey"`
 	Role      int       `json:"role" gorm:"type:int;default:1;not null"` // 1000: root, 100: admin, 1: common
 	User      User      `json:"-" gorm:"foreignKey:UserID"`
 	Project   Project   `json:"-" gorm:"foreignKey:ProjectID"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (up *UserProject) ValidateRole() error {

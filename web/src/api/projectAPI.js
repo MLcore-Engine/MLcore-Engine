@@ -27,6 +27,9 @@ export const projectAPI = {
       return response.data.data;
     } catch (error) {
       console.error('API Error in createProject:', error);
+      if (error.response && error.response.data && error.response.data.error) {
+        throw new Error(error.response.data.error);
+      }
       throw new Error('Failed to create project');
     }
   },
@@ -92,7 +95,8 @@ export const projectAPI = {
   //add member to a project
   addProjectMember: async (projectId, member) => {
     try {
-      const payload = { projectId, userId: member.userId, role: member.role };
+      const payload = { projectID: projectId, userID: member.userID, role: member.role };
+      console.log('Sending payload:', payload);
       const response = await API.post(`${MEMBERS_URL}`, payload);
       return response.data.data;
     } catch (error) {

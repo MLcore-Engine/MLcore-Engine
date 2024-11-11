@@ -254,3 +254,50 @@ const DataList = ({ title, data, columns, onAdd, onEdit, onDelete }) => {
 
 这种设计模式遵循了 React 的单向数据流，通过 props 传递数据和回调函数，实现了组件间的解耦和复用。
 
+
+
+**删除功能调用过程**
+
+```mermaid
+sequenceDiagram
+    participant UI as DataList Component
+    participant Page as ProjectGroupOrg
+    participant Context as ProjectContext
+    participant API as projectAPI
+    participant Backend as Backend API
+
+    UI->>UI: 用户点击删除按钮
+    UI->>UI: handleDeleteClick(item)
+    UI->>UI: 显示确认对话框
+    UI->>UI: handleConfirmDelete()
+    UI->>Page: onDelete(item)
+    Page->>Page: handleDelete(project)
+    Page->>Context: deleteProject(project.ID)
+    Context->>API: projectAPI.deleteProject(projectId)
+    API->>Backend: DELETE /api/project/{projectId}
+```
+
+
+
+```mermaid
+sequenceDiagram
+    participant User as 用户
+    participant Input as 搜索输入框
+    participant React as React状态
+    participant Filter as 过滤函数
+    participant Table as 表格显示
+
+    User->>Input: 输入"test"
+    Input->>React: 触发handleSearch
+    React->>React: setSearchTerm("test")
+    React->>Filter: 重新渲染组件
+    Filter->>Filter: 执行过滤逻辑
+    Filter->>Table: 更新显示过滤后的数据
+```
+
+
+
+
+
+
+

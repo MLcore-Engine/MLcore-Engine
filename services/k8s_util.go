@@ -469,12 +469,12 @@ func prepareLabelsPatch(labels map[string]string) ([]byte, error) {
 func (k *K8s) CreateServiceForNotebook(namespace, name string, port int, labels map[string]string) (*corev1.Service, error) {
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      name + "-svc",
+			Name:      name,
 			Namespace: namespace,
 			Labels:    labels,
 		},
 		Spec: corev1.ServiceSpec{
-			Type:     corev1.ServiceTypeClusterIP,
+			Type:     corev1.ServiceTypeNodePort,
 			Selector: labels,
 			Ports: []corev1.ServicePort{
 				{
@@ -487,12 +487,12 @@ func (k *K8s) CreateServiceForNotebook(namespace, name string, port int, labels 
 		},
 	}
 
-	// 尝试创建 Service
+	// try create Service
 	createdService, err := k.clientset.CoreV1().Services(namespace).Create(context.TODO(), service, metav1.CreateOptions{})
 	if err != nil {
 		if k8serrors.IsAlreadyExists(err) {
-			// 如果 Service 已存在，则更新它
-			existingService, err := k.clientset.CoreV1().Services(namespace).Get(context.TODO(), name+"-svc", metav1.GetOptions{})
+			// if Service already exists, update it
+			existingService, err := k.clientset.CoreV1().Services(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 			if err != nil {
 				return nil, fmt.Errorf("failed to get existing service: %v", err)
 			}
@@ -509,101 +509,101 @@ func (k *K8s) CreateServiceForNotebook(namespace, name string, port int, labels 
 	return createdService, nil
 }
 
-func (k *K8s) CreateService(
-	namespace, name, username string,
-	ports []interface{},
-	selector map[string]string,
-	serviceType corev1.ServiceType,
-	externalIP []string,
-	annotations map[string]string,
-	loadBalancerIP string,
-	disableLoadBalancer bool,
-) (*corev1.Service, error) {
-	servicePorts := []corev1.ServicePort{}
-	for i, port := range ports {
-		var servicePort corev1.ServicePort
-		switch p := port.(type) {
-		case []interface{}:
-			if len(p) > 1 {
-				portNum, _ := strconv.Atoi(fmt.Sprint(p[0]))
-				targetPort, _ := strconv.Atoi(fmt.Sprint(p[1]))
-				servicePort = corev1.ServicePort{
-					Name:       fmt.Sprintf("http%d", i),
-					Port:       int32(portNum),
-					Protocol:   corev1.ProtocolTCP,
-					TargetPort: intstr.FromInt(targetPort),
-				}
-				if serviceType == corev1.ServiceTypeNodePort {
-					servicePort.NodePort = int32(portNum)
-				}
-			}
-		default:
-			portNum, _ := strconv.Atoi(fmt.Sprint(p))
-			servicePort = corev1.ServicePort{
-				Name:       fmt.Sprintf("http%d", i),
-				Port:       int32(portNum),
-				Protocol:   corev1.ProtocolTCP,
-				TargetPort: intstr.FromInt(portNum),
-			}
-			if serviceType == corev1.ServiceTypeNodePort {
-				servicePort.NodePort = int32(portNum)
-			}
-		}
-		servicePorts = append(servicePorts, servicePort)
-	}
+// func (k *K8s) CreateService(
+// 	namespace, name, username string,
+// 	ports []interface{},
+// 	selector map[string]string,
+// 	serviceType corev1.ServiceType,
+// 	externalIP []string,
+// 	annotations map[string]string,
+// 	loadBalancerIP string,
+// 	disableLoadBalancer bool,
+// ) (*corev1.Service, error) {
+// 	servicePorts := []corev1.ServicePort{}
+// 	for i, port := range ports {
+// 		var servicePort corev1.ServicePort
+// 		switch p := port.(type) {
+// 		case []interface{}:
+// 			if len(p) > 1 {
+// 				portNum, _ := strconv.Atoi(fmt.Sprint(p[0]))
+// 				targetPort, _ := strconv.Atoi(fmt.Sprint(p[1]))
+// 				servicePort = corev1.ServicePort{
+// 					Name:       fmt.Sprintf("http%d", i),
+// 					Port:       int32(portNum),
+// 					Protocol:   corev1.ProtocolTCP,
+// 					TargetPort: intstr.FromInt(targetPort),
+// 				}
+// 				if serviceType == corev1.ServiceTypeNodePort {
+// 					servicePort.NodePort = int32(portNum)
+// 				}
+// 			}
+// 		default:
+// 			portNum, _ := strconv.Atoi(fmt.Sprint(p))
+// 			servicePort = corev1.ServicePort{
+// 				Name:       fmt.Sprintf("http%d", i),
+// 				Port:       int32(portNum),
+// 				Protocol:   corev1.ProtocolTCP,
+// 				TargetPort: intstr.FromInt(portNum),
+// 			}
+// 			if serviceType == corev1.ServiceTypeNodePort {
+// 				servicePort.NodePort = int32(portNum)
+// 			}
+// 		}
+// 		servicePorts = append(servicePorts, servicePort)
+// 	}
 
-	var clusterIP string
-	if disableLoadBalancer {
-		clusterIP = "None"
-	}
+// 	var clusterIP string
+// 	if disableLoadBalancer {
+// 		clusterIP = "None"
+// 	}
 
-	service := &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:        name,
-			Namespace:   namespace,
-			Labels:      selector,
-			Annotations: annotations,
-		},
-		Spec: corev1.ServiceSpec{
-			Ports:          servicePorts,
-			Selector:       selector,
-			Type:           serviceType,
-			ExternalIPs:    externalIP,
-			LoadBalancerIP: loadBalancerIP,
-			ClusterIP:      clusterIP,
-		},
-	}
+// 	service := &corev1.Service{
+// 		ObjectMeta: metav1.ObjectMeta{
+// 			Name:        name,
+// 			Namespace:   namespace,
+// 			Labels:      selector,
+// 			Annotations: annotations,
+// 		},
+// 		Spec: corev1.ServiceSpec{
+// 			Ports:          servicePorts,
+// 			Selector:       selector,
+// 			Type:           serviceType,
+// 			ExternalIPs:    externalIP,
+// 			LoadBalancerIP: loadBalancerIP,
+// 			ClusterIP:      clusterIP,
+// 		},
+// 	}
 
-	// 尝试读取现有的 Service
-	fmt.Printf("Attempting to create/update service %s in namespace %s\n", name, namespace)
+// 	// 尝试读取现有的 Service
+// 	fmt.Printf("Attempting to create/update service %s in namespace %s\n", name, namespace)
 
-	existingService, err := k.clientset.CoreV1().Services(namespace).Get(context.TODO(), name, metav1.GetOptions{})
-	fmt.Printf("Get existing service error: %v\n", err)
-	fmt.Println(existingService)
-	if err != nil {
-		if k8serrors.IsNotFound(err) {
-			fmt.Println("Service not found, creating new service")
-			createdService, err := k.clientset.CoreV1().Services(namespace).Create(context.TODO(), service, metav1.CreateOptions{})
-			fmt.Printf("Create service result: %+v\n", createdService)
-			fmt.Printf("Create service error: %v\n", err)
-			if err != nil {
-				return nil, fmt.Errorf("failed to create service: %v", err)
-			}
-			return createdService, nil
-		}
-		return nil, fmt.Errorf("failed to get service: %v", err)
-	}
+// 	existingService, err := k.clientset.CoreV1().Services(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+// 	fmt.Printf("Get existing service error: %v\n", err)
+// 	fmt.Println(existingService)
+// 	if err != nil {
+// 		if k8serrors.IsNotFound(err) {
+// 			fmt.Println("Service not found, creating new service")
+// 			createdService, err := k.clientset.CoreV1().Services(namespace).Create(context.TODO(), service, metav1.CreateOptions{})
+// 			fmt.Printf("Create service result: %+v\n", createdService)
+// 			fmt.Printf("Create service error: %v\n", err)
+// 			if err != nil {
+// 				return nil, fmt.Errorf("failed to create service: %v", err)
+// 			}
+// 			return createdService, nil
+// 		}
+// 		return nil, fmt.Errorf("failed to get service: %v", err)
+// 	}
 
-	fmt.Println("Service exists, updating")
-	updatedService, err := k.clientset.CoreV1().Services(namespace).Update(context.TODO(), service, metav1.UpdateOptions{})
-	fmt.Printf("Update service result: %+v\n", updatedService)
-	fmt.Printf("Update service error: %v\n", err)
-	if err != nil {
-		return nil, fmt.Errorf("failed to update service: %v", err)
-	}
+// 	fmt.Println("Service exists, updating")
+// 	updatedService, err := k.clientset.CoreV1().Services(namespace).Update(context.TODO(), service, metav1.UpdateOptions{})
+// 	fmt.Printf("Update service result: %+v\n", updatedService)
+// 	fmt.Printf("Update service error: %v\n", err)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to update service: %v", err)
+// 	}
 
-	return updatedService, nil
-}
+// 	return updatedService, nil
+// }
 
 func (k *K8s) DeleteService(namespace string, name string, labels map[string]string) error {
 	if name != "" {

@@ -79,6 +79,10 @@ func InitDB() (err error) {
 			return err
 		}
 
+		if err := db.AutoMigrate(&TrainingJob{}); err != nil {
+			return err
+		}
+
 		err = createRootAccountIfNeed()
 		return err
 	} else {

@@ -11,16 +11,17 @@ import (
 
 type User struct {
 	gorm.Model
-	Username         string    `json:"username" gorm:"uniqueIndex;not null" validate:"required,max=12"`
-	Password         string    `json:"-" gorm:"not null" validate:"required,min=8,max=20"` // 使用 json:"-" 在JSON中隐藏密码
-	DisplayName      string    `json:"displayName" gorm:"index" validate:"max=20"`
-	Role             int       `json:"role" gorm:"type:int;default:1"`   // 1000: root, 100: admin, 1: common
-	Status           int       `json:"status" gorm:"type:int;default:1"` // 1: enabled, 0: disabled
-	Email            string    `json:"email" validate:"max=50,email"`
-	GitHubID         string    `json:"githubId" gorm:"column:github_id"`
-	WeChatID         string    `json:"wechatId" gorm:"column:wechat_id"`
-	VerificationCode string    `json:"-" gorm:"-"`
-	Projects         []Project `json:"projects" gorm:"many2many:user_projects"`
+	Username         string     `json:"username" gorm:"uniqueIndex;not null" validate:"required,max=12"`
+	Password         string     `json:"-" gorm:"not null" validate:"required,min=8,max=20"` // 使用 json:"-" 在JSON中隐藏密码
+	DisplayName      string     `json:"display_name" gorm:"index" validate:"max=20"`
+	Role             int        `json:"role" gorm:"type:int;default:1"`   // 1000: root, 100: admin, 1: common
+	Status           int        `json:"status" gorm:"type:int;default:1"` // 1: enabled, 0: disabled
+	Email            string     `json:"email" validate:"max=50,email"`
+	GitHubID         string     `json:"github_id" gorm:"column:github_id"`
+	WeChatID         string     `json:"wechat_id" gorm:"column:wechat_id"`
+	VerificationCode string     `json:"-" gorm:"-"`
+	Projects         []Project  `json:"projects" gorm:"many2many:user_projects"`
+	Notebooks        []Notebook `json:"notebooks" gorm:"foreignKey:UserID;constraint:OnDelete:RESTRICT"`
 }
 
 func GetMaxUserId() uint {
@@ -29,25 +30,40 @@ func GetMaxUserId() uint {
 	return user.ID
 }
 
-func GetAllUsers(startIdx int, num int) (users []*User, err error) {
-	err = DB.Order("id desc").Limit(num).Offset(startIdx).Select([]string{"id", "username", "display_name", "role", "status", "email"}).Find(&users).Error
-	return users, err
+func GetAllUsers(offset, limit int) (users []*User, total int64, err error) {
+
+	err = DB.Model(&User{}).Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	err = DB.Order("id desc").
+		Limit(limit).
+		Offset(offset).
+		Select([]string{"id", "username", "display_name", "role", "status", "email"}).
+		Find(&users).Error
+	return users, total, err
 }
 
-func SearchUsers(keyword string) ([]*User, error) {
+func SearchUsers(keyword string, offset, limit int) (users []*User, total int64, err error) {
+	query := DB.Model(&User{}).Select("id", "username", "display_name", "role", "status", "email")
 
-	var users []*User
+	keywordLike := "%" + keyword + "%"
+	searchQuery := query.Where(DB.Where("id LIKE ?", keywordLike).
+		Or(DB.Where("username LIKE ?", keywordLike)).
+		Or(DB.Where("email LIKE ?", keywordLike)).
+		Or(DB.Where("display_name LIKE ?", keywordLike)))
 
-	query := DB.Select("id", "username", "display_name", "role", "status", "email")
+	err = searchQuery.Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
 
-	err := query.Where(DB.Or(
-		DB.Where("id = ?", keyword),
-		DB.Where("username LIKE ?", keyword+"%"),
-		DB.Where("email LIKE ?", keyword+"%"),
-		DB.Where("display_name LIKE ?", keyword+"%"),
-	)).Find(&users).Error
-	return users, err
+	err = searchQuery.Limit(limit).
+		Offset(offset).
+		Order("id DESC").
+		Find(&users).Error
 
+	return users, total, err
 }
 
 func GetUserById(id uint, selectAll bool) (*User, error) {
@@ -116,27 +132,27 @@ func (user *User) ValidateAndFill() (err error) {
 	// it won’t be used to build query conditions
 	password := user.Password
 	if user.Username == "" || password == "" {
-		return errors.New("用户名或密码为空")
+		return errors.New("username or password is empty")
 	}
-	DB.Where(User{Username: user.Username}).First(user)
+	DB.Preload("Projects").Where(User{Username: user.Username}).First(user)
 	okay := common.ValidatePasswordAndHash(password, user.Password)
 	if !okay || user.Status != common.UserStatusEnabled {
-		return errors.New("用户名或密码错误，或用户已被封禁")
+		return errors.New("username or password is incorrect, or user is banned")
 	}
 	return nil
 }
 
 func (user *User) FillUserById() error {
 	if user.ID == 0 {
-		return errors.New("id 为空！")
+		return errors.New("id is empty")
 	}
 
 	result := DB.Where("id = ?", user.ID).First(user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("未找到 ID 为 %d 的用户", user.ID)
+			return fmt.Errorf("user with ID %d not found", user.ID)
 		}
-		return fmt.Errorf("查询用户时出错: %w", result.Error)
+		return fmt.Errorf("error querying user: %w", result.Error)
 	}
 
 	return nil
@@ -144,7 +160,7 @@ func (user *User) FillUserById() error {
 
 func (user *User) FillUserByEmail() error {
 	if user.Email == "" {
-		return errors.New("email 为空！")
+		return errors.New("email is empty")
 	}
 
 	res := DB.Where("email = ?", user.Email).First(user)
@@ -254,18 +270,9 @@ func IsGitHubIdAlreadyTaken(githubId string) (bool, error) {
 	return count > 0, nil
 }
 
-func IsUsernameAlreadyTaken(username string) (bool, error) {
-	var count int64
-	result := DB.Model(&User{}).Where("username = ?", username).Count(&count)
-	if result.Error != nil {
-		return false, fmt.Errorf("error checking username: %w", result.Error)
-	}
-	return count > 0, nil
-}
-
 func ResetUserPasswordByEmail(email string, password string) error {
 	if email == "" || password == "" {
-		return errors.New("邮箱地址或密码为空！")
+		return errors.New("email or password is empty")
 	}
 	hashedPassword, err := common.Password2Hash(password)
 	if err != nil {

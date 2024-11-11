@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Dimmer, Loader, Segment } from 'semantic-ui-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { API, showError, showSuccess } from '../helpers';
-import { UserContext } from '../context/User';
+import { UserContext } from '../context/User/AuthContext';
 
 const GitHubOAuth = () => {
   const [searchParams, setSearchParams] = useSearchParams();

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import 'semantic-ui-css/semantic.min.css';  
-import { UserProvider } from './context/User';
+import { AuthProvider } from './context/AuthContext';
 import { ProjectProvider } from './context/ProjectContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,11 +11,11 @@ import App from './App';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <ProjectProvider>
-      <UserProvider>
+      <AuthProvider>
         <BrowserRouter>
           <App />   
           <ToastContainer />
         </BrowserRouter>
-      </UserProvider>
+      </AuthProvider>   
     </ProjectProvider>
 );

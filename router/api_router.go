@@ -91,7 +91,7 @@ func SetApiRouter(router *gin.Engine) {
 		{
 			projectMembershipsRoute.GET("/user/:userId", controller.GetUserProjects)
 			projectMembershipsRoute.POST("/", controller.AddUserToProject)
-			projectMembershipsRoute.DELETE("/:projectId/:userId", controller.RemoveUserFromProject)
+			projectMembershipsRoute.DELETE("/:projectID/:userID", controller.RemoveUserFromProject)
 			projectMembershipsRoute.PUT("/", controller.UpdateUserProjectRole)
 			projectMembershipsRoute.GET("/project/:projectId", controller.GetProjectMembers)
 		}
@@ -100,11 +100,20 @@ func SetApiRouter(router *gin.Engine) {
 		notebookRoute.Use(middleware.UserAuth())
 		{
 			notebookRoute.POST("/", controller.CreateNotebook)
-			notebookRoute.PUT("/:id", controller.UpdateNotebook)
+			// notebookRoute.PUT("/:id", controller.UpdateNotebook)
 			notebookRoute.DELETE("/:id", controller.DeleteNotebook)
-			notebookRoute.GET("/:id", controller.GetNotebook)
+			// notebookRoute.GET("/:id", controller.GetNotebook)
 			notebookRoute.GET("/get-all", controller.ListNotebooks)
-			notebookRoute.POST("/reset/:id", controller.ResetNotebook)
+			notebookRoute.GET("/reset/:id", controller.ResetNotebook)
+		}
+
+		pytorchJobRoute := apiRouter.Group("/pytorchtrain")
+		pytorchJobRoute.Use(middleware.UserAuth())
+		{
+			pytorchJobRoute.POST("/", controller.CreateTrainingJob)
+			pytorchJobRoute.DELETE("/:id", controller.DeleteTrainingJob)
+			pytorchJobRoute.GET("/:id", controller.GetTrainingJob)
+			pytorchJobRoute.GET("/get-all", controller.ListTrainingJobs)
 		}
 	}
 }

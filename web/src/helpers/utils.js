@@ -17,7 +17,7 @@ export function isRoot() {
 
 export function getSystemName() {
   let system_name = localStorage.getItem('system_name');
-  if (!system_name) return '项目模板';
+  if (!system_name) return 'MLcore-Engine';
   return system_name;
 }
 
@@ -57,18 +57,20 @@ export function showError(error) {
 
   // 如果当前路径已经是登录页，则不进行重定向
   if (currentPath.startsWith('/login')) {
-    toast.error('错误：' + (error.message || error), { autoClose: toastConstants.ERROR_TIMEOUT });
+    // toast.error('错误：' + (error.message || error), { autoClose: toastConstants.ERROR_TIMEOUT });
     return;
   }
 
   if (error.message) {
     if (error.name === 'AxiosError') {
+      console.log('error 33 response: ', error);
       switch (error.response.status) {
         case 401:
           // toast.error('错误：未登录或登录已过期，请重新登录！', showErrorOptions);
           if (!isRedirecting) {
             isRedirecting = true;
             console.warn('401 Unauthorized - 重定向到登录页面');
+            localStorage.removeItem('token');
             window.location.href = '/login?expired=true';
           }
           break;

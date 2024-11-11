@@ -225,3 +225,49 @@ const ProjectManage = () => {
 
 这个渲染过程展示了 React 和 React Router 如何协同工作来创建一个动态的单页应用,同时保持了良好的代码组织和组件复用。
 
+
+
+
+
+### datalist logic
+
+```
+graph TD
+    A[NotebookList Component] -->|Props传递| B[DataList Component]
+    
+    subgraph NotebookList
+    A -->|获取数据| C[notebookAPI.getNotebooks]
+    C -->|返回数据| A
+    A -->|定义表格配置| D[columns/columnNames配置]
+    A -->|定义操作| E[handleCreate/handleReset/handleDelete]
+    end
+    
+    subgraph DataList内部状态和方法
+    B -->|状态初始化| F[useState管理状态]
+    F -->|searchTerm| G[搜索关键词]
+    F -->|isConfirmOpen| H[确认框状态]
+    F -->|deleteItem| I[待删除项]
+    
+    B -->|数据处理| J[过滤和搜索逻辑]
+    J -->|safeFilter方法| K[数据过滤]
+    K -->|filteredData| L[过滤后数据]
+    end
+    
+    subgraph UI渲染流程
+    L -->|渲染| M[标题渲染]
+    L -->|渲染| N[搜索框和添加按钮]
+    L -->|渲染| O[表格头部]
+    L -->|渲染| P[表格主体]
+    P -->|每行渲染| Q[数据单元格]
+    P -->|每行渲染| R[操作按钮]
+    end
+    
+    subgraph 用户交互流程
+    N -->|搜索输入| S[handleSearch]
+    S -->|更新| G
+    R -->|点击删除| T[handleDeleteClick]
+    T -->|显示| U[确认对话框]
+    U -->|确认| V[handleConfirmDelete]
+    V -->|调用| W[onDelete回调]
+    end
+```

@@ -8,53 +8,55 @@ import (
 )
 
 type Notebook struct {
-	ID        uint `gorm:"primaryKey;comment:id主键"`
-	ProjectID uint `gorm:"not null;index;comment:项目组id"` // 定义外键，并创建索引
-	// Project          Project        `gorm:"foreignKey:ProjectID;references:ID"`
-	UserID          uint           `gorm:"not null;index;comment:用户id"`
-	Name            string         `gorm:"size:200;unique;comment:英文名"`
-	Describe        string         `gorm:"size:200;comment:描述"`
-	Namespace       string         `gorm:"size:200;default:jupyter;comment:命名空间"`
-	Images          string         `gorm:"size:200;default:'';comment:镜像"`
-	IDEType         string         `gorm:"size:100;default:jupyter;comment:ide类型"`
-	WorkingDir      string         `gorm:"size:200;default:'';comment:工作目录"`
-	Env             string         `gorm:"size:400;default:'';comment:环境变量"`
-	VolumeMount     string         `gorm:"size:2000;default:kubeflow-user-workspace:/mnt,kubeflow-archives:/archives;comment:挂载"`
-	NodeSelector    string         `gorm:"size:200;default:cpu=true,notebook=true;comment:机器选择器"`
-	ImagePullPolicy string         `gorm:"type:text;size:20;default:'Always';comment:镜像拉取策略"`
-	ResourceMemory  string         `gorm:"size:100;default:10G;comment:申请内存"`
-	ResourceCPU     string         `gorm:"size:100;default:10;comment:申请cpu"`
-	ResourceGPU     int64          `gorm:"size:100;default:0;comment:申请gpu"`
-	Status          string         `gorm:"size:50;default:'Creating';comment:notebookStatus"`
-	Expand          string         `gorm:"type:text;default:'{}';comment:扩展参数"`
-	CreatedAt       time.Time      `gorm:"autoCreateTime"`
-	UpdatedAt       time.Time      `gorm:"autoUpdateTime"`
-	DeletedAt       gorm.DeletedAt `gorm:"index"`
-	AccessURL       string         `gorm:"size:500;comment:访问URL"`
+	ID              uint      `json:"id" gorm:"primaryKey"`
+	ProjectID       uint      `json:"project_id" gorm:"index;constraint:OnDelete:RESTRICT"`
+	Project         Project   `json:"project" gorm:"foreignKey:ProjectID;references:ID"`
+	UserID          uint      `json:"user_id" gorm:"not null;index;constraint:OnDelete:RESTRICT"`
+	User            User      `json:"user" gorm:"foreignKey:UserID;references:ID"`
+	Name            string    `json:"name" gorm:"size:200;unique"`
+	Describe        string    `json:"describe" gorm:"size:200"`
+	Namespace       string    `json:"namespace" gorm:"size:200;default:jupyter"`
+	Image           string    `json:"image" gorm:"size:200;default:''"`
+	IDEType         string    `json:"ide_type" gorm:"size:100;default:jupyter"`
+	WorkingDir      string    `json:"working_dir" gorm:"size:200;default:''"`
+	Env             string    `json:"env" gorm:"size:400;default:''"`
+	VolumeMount     string    `json:"volume_mount" gorm:"size:2000"`
+	NodeSelector    string    `json:"node_selector" gorm:"size:200;default:notebook=true"`
+	ImagePullPolicy string    `json:"image_pull_policy" gorm:"size:20;default:'Always'"`
+	ResourceMemory  string    `json:"resource_memory" gorm:"size:100;default:8G"`
+	ResourceCPU     string    `json:"resource_cpu" gorm:"size:100;default:4"`
+	ResourceGPU     int64     `json:"resource_gpu" gorm:"default:0"`
+	Status          string    `json:"status" gorm:"size:50;default:'Creating'"`
+	Expand          string    `json:"expand" gorm:"type:text;default:'{}'"`
+	CreatedAt       time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt       time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	AccessURL       string    `json:"access_url" gorm:"size:500"`
 }
 
-// Insert 创建新的 Notebook
+// Insert creates a new Notebook
 func (n *Notebook) Insert() error {
 	return DB.Create(n).Error
 }
 
-// Update 更新 Notebook
+// Update updates the Notebook
 func (n *Notebook) Update() error {
-	// DB.Save()
 	return DB.Model(n).Updates(n).Error
 }
 
-// Delete 删除 Notebook
+// Delete removes the Notebook (hard delete)
 func (n *Notebook) Delete() error {
-	return DB.Unscoped().Delete(n).Error
+	if n.ID == 0 {
+		return errors.New("id is empty")
+	}
+	return DB.Delete(n).Error
 }
 
-// GetNotebookByID 根据 ID 获取 Notebook
+// GetNotebookByID retrieves a Notebook by ID
 func GetNotebookByID(id uint) (*Notebook, error) {
 	var notebook Notebook
-	result := DB.Unscoped().First(&notebook, id)
+	result := DB.First(&notebook, id)
 	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, errors.New("notebook not found")
 		}
 		return nil, result.Error
@@ -62,7 +64,7 @@ func GetNotebookByID(id uint) (*Notebook, error) {
 	return &notebook, nil
 }
 
-// GetAllNotebooksPaginated 获取所有 Notebooks（带分页）
+// GetAllNotebooksPaginated retrieves all Notebooks with pagination
 func GetAllNotebooksPaginated(offset, limit int) ([]Notebook, int64, error) {
 	var notebooks []Notebook
 	var total int64
@@ -76,7 +78,7 @@ func GetAllNotebooksPaginated(offset, limit int) ([]Notebook, int64, error) {
 	return notebooks, total, err
 }
 
-// GetUserNotebooksPaginated 获取特定用户的 Notebooks（带分页）
+// GetUserNotebooksPaginated retrieves Notebooks for a specific user with pagination
 func GetUserNotebooksPaginated(userID int, offset, limit int) ([]Notebook, int64, error) {
 	var notebooks []Notebook
 	var total int64
@@ -90,14 +92,14 @@ func GetUserNotebooksPaginated(userID int, offset, limit int) ([]Notebook, int64
 	return notebooks, total, err
 }
 
-// SearchNotebooks 搜索 Notebooks
+// SearchNotebooks searches Notebooks by keyword
 func SearchNotebooks(keyword string) ([]Notebook, error) {
 	var notebooks []Notebook
 	err := DB.Where("name LIKE ? OR describe LIKE ?", "%"+keyword+"%", "%"+keyword+"%").Find(&notebooks).Error
 	return notebooks, err
 }
 
-// Reset 重置 Notebook（这里只是一个示例，具体实现可能需要根据你的业务逻辑来定）
+// Reset updates the Notebook's UpdatedAt timestamp
 func (n *Notebook) Reset() error {
 	n.UpdatedAt = time.Now()
 	return DB.Save(n).Error

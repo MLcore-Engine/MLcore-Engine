@@ -1,88 +1,200 @@
 import React, { useState } from 'react';
 import { Table, Input, Button, Icon, Confirm } from 'semantic-ui-react';
-import styles from './DataList.module.css';
 
-const DataList = ({ title, data, columns, onAdd, onEdit, onDelete }) => {
+const DataList = ({
+  title,
+  data,
+  columns,
+  columnNames,
+  onAdd,
+  onEdit,
+  onDelete,
+  customActions,
+  renderRow,
+}) => {
+  
   const [searchTerm, setSearchTerm] = useState('');
-
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [deleteItemId, setDeleteItemId] = useState(null);
+  const [deleteItem, setDeleteItem] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmContent, setConfirmContent] = useState('');
+  const [confirmButtons, setConfirmButtons] = useState({});
 
-  const handleDeleteclick = (id) => {
-    setDeleteItemId(id);
-    setIsConfirmOpen(true);
+  const handleActionClick = (item, action) => {
+    if (action.confirm) {
+      setConfirmAction(() => () => action.onClick(item));
+      setConfirmContent(action.confirm.content || 'are you sure？');
+      setConfirmButtons({
+        confirmButton: action.confirm.confirmButton || 'yes',
+        cancelButton: action.confirm.cancelButton || 'no',
+      });
+      setIsConfirmOpen(true);
+    } else {
+      action.onClick(item);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (confirmAction) {
+      confirmAction();
+      setConfirmAction(null);
+    }
+    setIsConfirmOpen(false);
+    setConfirmContent('');
+    setConfirmButtons({});
+  };
+
+  // 取消操作
+  const handleCancel = () => {
+    setIsConfirmOpen(false);
+    setConfirmAction(null);
+    setConfirmContent('');
+    setConfirmButtons({});
   };
 
   const handleConfirmDelete = () => {
-    if (deleteItemId) {
-      onDelete(deleteItemId);
+    if (deleteItem) {
+      onDelete(deleteItem);
       setIsConfirmOpen(false);
-      setDeleteItemId(null);
+      setDeleteItem(null);
     }
+  };
+
+
+  const renderConfirm = () => {
+    
+    // if custom action confirm
+    if (confirmAction) {
+      return (
+        <Confirm
+          open={isConfirmOpen}
+          content={confirmContent}
+          onCancel={handleCancel}
+          onConfirm={handleConfirm}
+          cancelButton={confirmButtons.cancelButton || '取消'}
+          confirmButton={confirmButtons.confirmButton || '确定'}
+          size="mini"
+          dimmer="inverted"
+        />
+      );
+    }
+
+    // if delete confirm
+    if (deleteItem) {
+      return (
+        <Confirm
+          open={isConfirmOpen}
+          content="are you sure？"
+          onCancel={() => setIsConfirmOpen(false)}
+          onConfirm={handleConfirmDelete}
+          cancelButton="no"
+          confirmButton="yes"
+          size="mini"
+        />
+      );
+    }
+
+    return null;
+  };
+
+  const handleDeleteClick = (item) => {
+    setDeleteItem(item);
+    setIsConfirmOpen(true);
   };
 
   const handleSearch = (e, { value }) => setSearchTerm(value);
 
-  const filteredData = data.filter((item) =>
-    Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  const safeFilter = (item) => {
+    try {
+      return columns.some((column) => {
+        const value = item[column];
+        if (value == null) return false;
+        return value.toString().toLowerCase().includes(searchTerm.toLowerCase());
+      });
+    } catch (error) {
+      console.error('search error :', error);
+      return false;
+    }
+  };
+
+
+
+  const filteredData = data.filter(safeFilter);
 
   return (
     <div>
-      <h2>{title}</h2>
+      <h3>{title}</h3>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1em' }}>
-        <Input icon="search" placeholder="搜索..." value={searchTerm} onChange={handleSearch} />
-        <Button primary onClick={onAdd}>  
-          <Icon name="plus" /> 添加
-        </Button>
+        <Input icon="search" placeholder="searching..." value={searchTerm} onChange={handleSearch} />
+        {onAdd && (
+          <Button primary onClick={onAdd}>
+            <Icon name="plus" /> Add
+          </Button>
+        )}
       </div>
       <Table celled striped>
         <Table.Header>
           <Table.Row>
             {columns.map((column) => (
-              <Table.HeaderCell sortable key={column}>{column}</Table.HeaderCell>
+              <Table.HeaderCell key={column}>
+                {columnNames[column] || column}
+              </Table.HeaderCell>
             ))}
-            <Table.HeaderCell sortable >操作</Table.HeaderCell>
+            <Table.HeaderCell>Action</Table.HeaderCell> 
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {filteredData.map((item) => (
-            <Table.Row key={item.id}>
-              {columns.map((column) => (
-                <Table.Cell key={`${item.id}-${column}`}>{item[column]}</Table.Cell>
-              ))}
-              <Table.Cell>
-                <Button icon color="blue" onClick={() => onEdit(item)}>
-                  <Icon name="edit" />
-                </Button>
-                <Button icon color="red" onClick={() => handleDeleteclick(item.id)}>
-                  <Icon name="trash" />
-                </Button>
-              </Table.Cell>
-            </Table.Row>
-          ))}
-          {filteredData.length === 0 && (
+          {filteredData.length > 0 ? (
+            filteredData.map((item) => {
+              const rowData = renderRow ? renderRow(item) : item;
+              return (
+                <Table.Row key={item.ID}>
+                  {columns.map((column) => (
+                    <Table.Cell key={`${item.ID}-${column}`}>
+                      {rowData[column]}
+                    </Table.Cell>
+                  ))}
+                  <Table.Cell>
+                    {customActions && customActions.length > 0
+                      ? customActions.map((action, index) => (
+                          <Button
+                            key={index}
+                            icon
+                            color={action.color}
+                            onClick={() => handleActionClick(item, action)}
+                            aria-label={`${action.color}-action-button`}
+                            >
+                            <Icon name={action.icon} />
+                          </Button>
+                        ))
+                      : <>
+                          {onEdit && (
+                            <Button icon color="blue" onClick={() => onEdit(item)}>
+                              <Icon name="edit" />
+                            </Button>
+                          )}
+                          {onDelete && (
+                            <Button icon color="red" onClick={() => handleDeleteClick(item)}>
+                              <Icon name="trash" />
+                            </Button>
+                          )}
+                        </>
+                    }
+                  </Table.Cell>
+                </Table.Row>
+              );
+            })
+          ) : (
             <Table.Row>
               <Table.Cell colSpan={columns.length + 1} textAlign="center">
-                无数据
+                No data
               </Table.Cell>
             </Table.Row>
           )}
         </Table.Body>
       </Table>
 
-      <Confirm
-        open={isConfirmOpen}
-        content="确定要删除？"
-        onCancel={() => setIsConfirmOpen(false)}
-        onConfirm={handleConfirmDelete}
-        cancelButton="取消"
-        confirmButton="确定"
-        size='mini'
-        className={styles.customConfirmDialog} 
-      />
+      {renderConfirm()}
     </div>
   );
 };

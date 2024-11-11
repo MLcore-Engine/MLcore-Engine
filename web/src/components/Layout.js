@@ -8,7 +8,12 @@ import SidebarComponent from './sidebars/SidebarComponent';
 const Layout = () => {
   const location = useLocation();
   const isHomePage = ['/', '/dashboard', '/about'].includes(location.pathname);
-  const hasSidebar = location.pathname.startsWith('/project/') || location.pathname.startsWith('/notebook');
+  
+  const hasSidebar = (
+    location.pathname.startsWith('/project/') ||
+    location.pathname.startsWith('/notebook') ||
+    location.pathname.startsWith('/training')
+  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
