@@ -1,8 +1,9 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import ProjectManagementSidebar from './ProjectManagementSidebar';
-import ModelDevelopmentSidebar from './ModelDevelopmentSidebar';
+import ModelDevelopmentSidebar from './ModelDevelopSidebar';
 import ModelTrainingSidebar from './ModelTrainingSidebar';
+import ModelServingSidebar from './ModelServingSidebar';
 
 const SidebarComponent = () => {
   const location = useLocation();
@@ -20,6 +21,10 @@ const SidebarComponent = () => {
     }
     return null;
   };
+
+    if (location.pathname.startsWith('/serving')) {
+      return <ModelServingSidebar />;
+    }
 
   const sidebarContent = renderSidebar();
 

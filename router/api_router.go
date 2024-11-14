@@ -115,5 +115,16 @@ func SetApiRouter(router *gin.Engine) {
 			pytorchJobRoute.GET("/:id", controller.GetTrainingJob)
 			pytorchJobRoute.GET("/get-all", controller.ListTrainingJobs)
 		}
+
+		tritonDeployRoute := apiRouter.Group("/triton")
+		tritonDeployRoute.Use(middleware.UserAuth())
+		{
+			tritonDeployRoute.POST("/", controller.CreateTritonDeploy)
+			tritonDeployRoute.DELETE("/:id", controller.DeleteTritonDeploy)
+			tritonDeployRoute.PUT("/:id", controller.UpdateTritonDeploy)
+			// tritonDeployRoute.GET("/:id", controller.GetTritonDeploy)
+			tritonDeployRoute.GET("/get-all", controller.ListTritonDeploys)
+		}
+
 	}
 }

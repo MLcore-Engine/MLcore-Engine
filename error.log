@@ -12,3 +12,10 @@
 [FATAL] 2024/10/30 - 10:29:48 | [near "=": syntax error] 
 [FATAL] 2024/10/30 - 10:30:05 | [near "=": syntax error] 
 [FATAL] 2024/10/30 - 10:30:41 | [near "=": syntax error] 
+[FATAL] 2024/11/13 - 19:50:09 | [failed to parse 4Gi as default value for int, got error: strconv.ParseInt: parsing "4Gi": invalid syntax] 
+[SYS] 2024/11/13 - 20:50:07 | deployments.apps "root-triqxlhj" not found 
+[SYS] 2024/11/13 - 20:50:07 | services "root-triqxlhj" not found 
+[SYS] 2024/11/13 - 20:50:11 | deployments.apps "root-trib848v" not found 
+[SYS] 2024/11/13 - 20:50:11 | services "root-trib848v" not found 
+[SYS] 2024/11/13 - 20:50:13 | deployments.apps "root-trivnb1b" not found 
+[SYS] 2024/11/13 - 20:50:14 | services "root-trivnb1b" not found 

@@ -13,12 +13,14 @@ const PasswordResetForm = lazy(() => import('./components/PasswordResetForm'));
 
 // Private components
 const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
 const ProjectGroupOrg = lazy(() => import('./pages/Project/ProjectGroupOrg'));
 const ProjectManage = lazy(() => import('./pages/Project/ProjectManage'));
 const NotebookList = lazy(() => import('./pages/ModelDevelop/NotebookList'));
 const ImageManagement = lazy(() => import('./pages/ImageManagement'));
 const ModelTraining = lazy(() => import('./pages/Training/ModelTraining'));
 const ModelDeployment = lazy(() => import('./pages/ModelDeployment'));
+const ServingList = lazy(() => import('./pages/Serving/ServingList'));
 const User = lazy(() => import('./pages/User'));
 const UserList = lazy(() => import('./pages/User/UserList'));
 const Setting = lazy(() => import('./pages/Setting'));
@@ -65,7 +67,8 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/reset" element={<PrivateRoute><PasswordResetForm /> </PrivateRoute>} />
           <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
-
+          <Route path="/about" element={<PrivateRoute><About /></PrivateRoute>} />
+          
           {/* project manage module */}
 		      <Route path="/project" element={<Navigate to="/project/project_list" replace />} />
           <Route path="/project/project_list" element={<PrivateRoute><ProjectGroupOrg /></PrivateRoute>} />
@@ -78,6 +81,9 @@ function App() {
           
           <Route path="/training" element={<Navigate to="/training/training-list" replace />} />
           <Route path="/training/training-list" element={<PrivateRoute><ModelTraining /></PrivateRoute>} />
+
+          <Route path="/serving" element={<Navigate to="/serving/serving-list" replace />} />
+          <Route path="/serving/serving-list" element={<PrivateRoute><ServingList /></PrivateRoute>} />
 
           <Route path="/image" element={<PrivateRoute><ImageManagement /></PrivateRoute>} />
           <Route path="/train" element={<PrivateRoute><ModelTraining /></PrivateRoute>} />

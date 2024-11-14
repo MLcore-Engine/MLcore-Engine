@@ -29,8 +29,8 @@ const headerButtons = [
     icon: 'cogs',
   },
   {
-    name: '模型部署',
-    to: '/deploy',
+    name: '模型服务',
+    to: '/serving',
     icon: 'cloud',
   },
   {

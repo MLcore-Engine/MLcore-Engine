@@ -83,6 +83,10 @@ func InitDB() (err error) {
 			return err
 		}
 
+		if err := db.AutoMigrate(&TritonDeploy{}); err != nil {
+			return err
+		}
+
 		err = createRootAccountIfNeed()
 		return err
 	} else {

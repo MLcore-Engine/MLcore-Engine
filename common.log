@@ -10595,3 +10595,199 @@
 [GIN] 2024/11/11 - 16:31:46 | 200 |     432.792µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
 [GIN] 2024/11/11 - 16:31:53 | 200 |     391.625µs |             ::1 | GET      "/api/user/manage/?page=1&limit=10"
 [GIN] 2024/11/11 - 16:31:56 | 200 |     297.375µs |             ::1 | GET      "/api/user/manage/?page=1&limit=10"
+[SYS] 2024/11/11 - 17:41:32 | Gin Template v0.0.0 started 
+[SYS] 2024/11/11 - 17:41:32 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/11 - 17:41:32 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/11 - 17:41:37 | 200 |     393.833µs |             ::1 | GET      "/notebook/env-list"
+[GIN] 2024/11/11 - 17:41:37 | 200 |      73.583µs |             ::1 | GET      "/api/status"
+[GIN] 2024/11/11 - 17:41:37 | 200 |    2.363875ms |             ::1 | GET      "/api/project/get-all"
+[GIN] 2024/11/11 - 17:41:39 | 200 |    1.050833ms |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 17:41:42 | 200 |     961.083µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 17:41:44 | 200 |     817.416µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 17:41:45 | 200 |         469µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 17:41:48 | 200 |     488.292µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 17:41:50 | 200 |     437.125µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 17:42:01 | 200 |     622.542µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 17:42:05 | 200 |     415.542µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[SYS] 2024/11/11 - 22:05:44 | Gin Template v0.0.0 started 
+[SYS] 2024/11/11 - 22:05:44 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/11 - 22:05:44 | REDIS_CONN_STRING not set, Redis is not enabled 
+[SYS] 2024/11/11 - 22:06:24 | Gin Template v0.0.0 started 
+[SYS] 2024/11/11 - 22:06:24 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/11 - 22:06:24 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/11 - 22:06:35 | 200 |    4.984834ms |             ::1 | GET      "/static/js/5.8f57e40c.chunk.js"
+[GIN] 2024/11/11 - 22:06:35 | 200 |    7.910209ms |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css"
+[GIN] 2024/11/11 - 22:06:35 | 200 |     120.667µs |             ::1 | GET      "/api/status"
+[GIN] 2024/11/11 - 22:06:35 | 200 |    2.585708ms |             ::1 | GET      "/api/project/get-all"
+[SYS] 2024/11/11 - 22:08:00 | Gin Template v0.0.0 started 
+[SYS] 2024/11/11 - 22:08:00 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/11 - 22:08:00 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/11 - 22:08:40 | 200 |     390.875µs |             ::1 | GET      "/about"
+[GIN] 2024/11/11 - 22:08:40 | 200 |    3.308084ms |             ::1 | GET      "/static/js/main.a488ae15.chunk.js"
+[GIN] 2024/11/11 - 22:08:40 | 200 |     101.209µs |             ::1 | GET      "/static/js/20.db982de9.chunk.js"
+[GIN] 2024/11/11 - 22:08:40 | 200 |      77.875µs |             ::1 | GET      "/api/status"
+[GIN] 2024/11/11 - 22:08:40 | 200 |    1.339791ms |             ::1 | GET      "/api/project/get-all"
+[GIN] 2024/11/11 - 22:08:41 | 200 |     229.709µs |             ::1 | GET      "/static/js/15.fe050c7f.chunk.js"
+[GIN] 2024/11/11 - 22:08:53 | 200 |     122.917µs |             ::1 | GET      "/static/js/12.400d68f0.chunk.js"
+[GIN] 2024/11/11 - 22:09:27 | 200 |     214.959µs |             ::1 | GET      "/static/js/6.b9020c54.chunk.js"
+[GIN] 2024/11/11 - 22:09:30 | 200 |     315.041µs |             ::1 | GET      "/static/js/8.e89f8da2.chunk.js"
+[GIN] 2024/11/11 - 22:09:30 | 200 |     400.709µs |             ::1 | GET      "/api/user/manage/?page=1&limit=10"
+[GIN] 2024/11/11 - 22:09:31 | 200 |     119.833µs |             ::1 | GET      "/static/js/9.305d0d48.chunk.js"
+[GIN] 2024/11/11 - 22:09:31 | 200 |     658.791µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:09:35 | 200 |       68.25µs |             ::1 | GET      "/static/js/21.da206922.chunk.js"
+[GIN] 2024/11/11 - 22:09:37 | 200 |     245.541µs |             ::1 | GET      "/static/js/10.9626efb3.chunk.js"
+[GIN] 2024/11/11 - 22:09:37 | 200 |    1.086416ms |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:09:46 | 200 |      99.958µs |             ::1 | GET      "/static/js/16.a7a725e2.chunk.js"
+[GIN] 2024/11/11 - 22:11:40 | 200 |     520.875µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:11:41 | 200 |     484.792µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:11:42 | 200 |     567.209µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:11:44 | 200 |     563.708µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:11:45 | 200 |     738.083µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:11:49 | 200 |     502.666µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:11:51 | 200 |     468.125µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:22:49 | 200 |     588.459µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:22:49 | 200 |       394.5µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:22:51 | 200 |     519.167µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/11 - 22:22:52 | 200 |       787.5µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/12 - 08:49:23 | 200 |     515.083µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/12 - 08:49:24 | 200 |     520.625µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/12 - 08:49:37 | 200 |     478.792µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/12 - 08:49:39 | 200 |     478.208µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/12 - 08:49:40 | 200 |     497.333µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/12 - 09:13:29 | 200 |     838.583µs |             ::1 | GET      "/static/js/5.8f57e40c.chunk.js"
+[GIN] 2024/11/12 - 09:13:29 | 200 |       2.312ms |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css"
+[GIN] 2024/11/12 - 09:13:29 | 200 |     142.167µs |             ::1 | GET      "/static/media/brand-icons.e8c322de.woff2"
+[GIN] 2024/11/12 - 20:21:55 | 200 |     293.833µs |             ::1 | GET      "/static/js/5.8f57e40c.chunk.js"
+[GIN] 2024/11/12 - 20:21:55 | 200 |       358.5µs |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css"
+[GIN] 2024/11/12 - 20:21:55 | 200 |      81.375µs |             ::1 | GET      "/static/media/brand-icons.e8c322de.woff2"
+[GIN] 2024/11/12 - 20:21:55 | 200 |       36.25µs |             ::1 | GET      "/static/js/0.a8696821.chunk.js"
+[GIN] 2024/11/12 - 20:21:55 | 200 |       12.75µs |             ::1 | GET      "/static/js/18.64675119.chunk.js"
+[SYS] 2024/11/13 - 08:55:51 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 08:55:51 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 08:55:51 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/13 - 08:55:53 | 200 |     445.333µs |             ::1 | GET      "/login"
+[GIN] 2024/11/13 - 08:55:53 | 200 |       3.803ms |             ::1 | GET      "/static/js/5.8f57e40c.chunk.js"
+[GIN] 2024/11/13 - 08:55:53 | 200 |       98.75µs |             ::1 | GET      "/static/js/main.a488ae15.chunk.js"
+[GIN] 2024/11/13 - 08:55:53 | 200 |    4.556917ms |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css"
+[GIN] 2024/11/13 - 08:55:53 | 200 |      119.75µs |             ::1 | GET      "/static/js/0.97568c8b.chunk.js"
+[GIN] 2024/11/13 - 08:55:53 | 200 |      41.208µs |             ::1 | GET      "/static/js/19.da121537.chunk.js"
+[GIN] 2024/11/13 - 08:55:53 | 401 |      28.708µs |             ::1 | GET      "/api/project/get-all"
+[GIN] 2024/11/13 - 08:55:53 | 200 |      83.541µs |             ::1 | GET      "/api/status"
+[GIN] 2024/11/13 - 08:56:01 | 200 |   82.828583ms |             ::1 | POST     "/api/user/login"
+[SYS] 2024/11/13 - 19:50:09 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 19:50:09 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 19:51:24 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 19:51:24 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 19:51:24 | REDIS_CONN_STRING not set, Redis is not enabled 
+[SYS] 2024/11/13 - 19:52:09 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 19:52:09 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 19:52:09 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/13 - 19:53:16 | 200 |   81.637459ms |             ::1 | POST     "/api/user/login"
+[GIN] 2024/11/13 - 19:54:57 | 401 |       57.25µs |             ::1 | POST     "/api/triton/"
+[GIN] 2024/11/13 - 19:55:14 | 200 |  1.085010292s |             ::1 | POST     "/api/triton/"
+[SYS] 2024/11/13 - 20:14:57 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 20:14:57 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 20:14:57 | REDIS_CONN_STRING not set, Redis is not enabled 
+[SYS] 2024/11/13 - 20:29:53 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 20:29:53 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 20:29:53 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/13 - 20:30:23 | 200 |   67.682708ms |             ::1 | DELETE   "/api/triton/1"
+[GIN] 2024/11/13 - 20:32:23 | 200 |    1.1004875s |             ::1 | POST     "/api/triton/"
+[GIN] 2024/11/13 - 20:33:08 | 400 |         219µs |             ::1 | POST     "/api/triton/"
+[GIN] 2024/11/13 - 20:33:20 | 200 |  1.056323709s |             ::1 | POST     "/api/triton/"
+[GIN] 2024/11/13 - 20:34:33 | 500 |     8.79325ms |             ::1 | DELETE   "/api/triton/1"
+[GIN] 2024/11/13 - 20:34:37 | 200 |       44.26ms |             ::1 | DELETE   "/api/triton/2"
+[GIN] 2024/11/13 - 20:34:41 | 200 |   37.516292ms |             ::1 | DELETE   "/api/triton/3"
+[GIN] 2024/11/13 - 20:34:46 | 200 |  1.051517625s |             ::1 | POST     "/api/triton/"
+[GIN] 2024/11/13 - 20:34:53 | 200 |     1.058672s |             ::1 | POST     "/api/triton/"
+[GIN] 2024/11/13 - 20:35:06 | 200 |  1.060834042s |             ::1 | POST     "/api/triton/"
+[GIN] 2024/11/13 - 20:36:04 | 200 |    1.101125ms |             ::1 | GET      "/api/triton/get-all"
+[SYS] 2024/11/13 - 20:49:54 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 20:49:54 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 20:49:54 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/13 - 20:50:07 | 200 |   55.909541ms |             ::1 | DELETE   "/api/triton/1"
+[GIN] 2024/11/13 - 20:50:11 | 200 |   18.060959ms |             ::1 | DELETE   "/api/triton/2"
+[GIN] 2024/11/13 - 20:50:14 | 200 |   23.009875ms |             ::1 | DELETE   "/api/triton/3"
+[GIN] 2024/11/13 - 20:50:27 | 200 |    2.244542ms |             ::1 | GET      "/api/triton/get-all"
+[GIN] 2024/11/13 - 20:50:28 | 200 |     593.834µs |             ::1 | GET      "/api/triton/get-all"
+[GIN] 2024/11/13 - 20:50:44 | 200 |     770.583µs |             ::1 | GET      "/api/triton/get-all"
+[GIN] 2024/11/13 - 20:50:55 | 200 |   76.828333ms |             ::1 | POST     "/api/user/login"
+[GIN] 2024/11/13 - 20:51:03 | 200 |     955.459µs |             ::1 | GET      "/api/triton/get-all"
+[SYS] 2024/11/13 - 20:52:41 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 20:52:41 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 20:52:41 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/13 - 20:52:45 | 200 |    1.694333ms |             ::1 | GET      "/api/triton/get-all"
+[GIN] 2024/11/13 - 20:52:46 | 200 |     799.542µs |             ::1 | GET      "/api/triton/get-all"
+[SYS] 2024/11/13 - 20:53:27 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 20:53:27 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 20:53:27 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/13 - 20:53:31 | 200 |    1.680041ms |             ::1 | GET      "/api/triton/get-all"
+[GIN] 2024/11/13 - 20:53:53 | 200 |     70.8765ms |             ::1 | DELETE   "/api/triton/4"
+[GIN] 2024/11/13 - 20:54:08 | 404 |      732.25µs |             ::1 | DELETE   "/api/triton/1"
+[GIN] 2024/11/13 - 20:54:17 | 404 |     399.084µs |             ::1 | DELETE   "/api/triton/2"
+[GIN] 2024/11/13 - 20:54:34 | 404 |     864.542µs |             ::1 | DELETE   "/api/triton/3"
+[GIN] 2024/11/13 - 20:54:37 | 404 |     463.083µs |             ::1 | DELETE   "/api/triton/3"
+[GIN] 2024/11/13 - 20:54:38 | 404 |     442.708µs |             ::1 | DELETE   "/api/triton/3"
+[GIN] 2024/11/13 - 20:54:38 | 404 |     328.875µs |             ::1 | DELETE   "/api/triton/3"
+[GIN] 2024/11/13 - 20:55:26 | 404 |     432.375µs |             ::1 | DELETE   "/api/triton/3"
+[SYS] 2024/11/13 - 21:50:25 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 21:50:25 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 21:50:25 | REDIS_CONN_STRING not set, Redis is not enabled 
+[SYS] 2024/11/13 - 21:51:33 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 21:51:33 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 21:51:33 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/13 - 21:51:39 | 200 |    6.101916ms |             ::1 | GET      "/"
+[GIN] 2024/11/13 - 21:51:39 | 200 |     227.125µs |             ::1 | GET      "/static/js/main.84135cd1.chunk.js"
+[GIN] 2024/11/13 - 21:51:39 | 200 |     946.917µs |             ::1 | GET      "/static/js/5.adc130c6.chunk.js"
+[GIN] 2024/11/13 - 21:51:39 | 200 |    1.184542ms |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css"
+[GIN] 2024/11/13 - 21:51:42 | 200 |       72.75µs |             ::1 | GET      "/"
+[GIN] 2024/11/13 - 21:51:47 | 200 |       145.5µs |             ::1 | GET      "/static/js/main.84135cd1.chunk.js.map"
+[GIN] 2024/11/13 - 21:51:47 | 200 |    5.359916ms |             ::1 | GET      "/static/js/5.adc130c6.chunk.js.map"
+[GIN] 2024/11/13 - 21:51:47 | 200 |     5.69825ms |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css.map"
+[GIN] 2024/11/13 - 21:51:49 | 200 |      94.875µs |             ::1 | GET      "/"
+[GIN] 2024/11/13 - 21:52:26 | 200 |      67.042µs |             ::1 | GET      "/"
+[SYS] 2024/11/13 - 21:53:30 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 21:53:30 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 21:53:30 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/13 - 21:53:31 | 200 |    3.630209ms |             ::1 | GET      "/"
+[SYS] 2024/11/13 - 21:54:22 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 21:54:22 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 21:54:22 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/13 - 21:54:29 | 200 |    8.417125ms |             ::1 | GET      "/"
+[GIN] 2024/11/13 - 21:54:29 | 200 |         152µs |             ::1 | GET      "/static/js/main.2d9feb34.chunk.js"
+[GIN] 2024/11/13 - 21:54:29 | 200 |    1.277458ms |             ::1 | GET      "/static/js/5.adc130c6.chunk.js"
+[GIN] 2024/11/13 - 21:54:29 | 200 |    1.587584ms |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css"
+[GIN] 2024/11/13 - 21:54:29 | 200 |    1.901417ms |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css.map"
+[GIN] 2024/11/13 - 21:54:29 | 200 |     115.083µs |             ::1 | GET      "/static/js/main.2d9feb34.chunk.js.map"
+[GIN] 2024/11/13 - 21:54:29 | 200 |    3.376834ms |             ::1 | GET      "/static/js/5.adc130c6.chunk.js.map"
+[GIN] 2024/11/13 - 21:54:30 | 200 |     134.709µs |             ::1 | GET      "/favicon.ico"
+[GIN] 2024/11/13 - 21:54:32 | 200 |      66.333µs |             ::1 | GET      "/"
+[GIN] 2024/11/13 - 21:54:32 | 200 |     216.959µs |             ::1 | GET      "/static/js/5.adc130c6.chunk.js"
+[GIN] 2024/11/13 - 21:54:32 | 200 |     381.917µs |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css"
+[GIN] 2024/11/13 - 21:54:32 | 200 |      54.125µs |             ::1 | GET      "/static/js/main.2d9feb34.chunk.js"
+[GIN] 2024/11/13 - 21:54:32 | 200 |      1.3465ms |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css.map"
+[GIN] 2024/11/13 - 21:54:32 | 200 |     149.125µs |             ::1 | GET      "/static/js/main.2d9feb34.chunk.js.map"
+[GIN] 2024/11/13 - 21:54:32 | 200 |      2.6115ms |             ::1 | GET      "/static/js/5.adc130c6.chunk.js.map"
+[GIN] 2024/11/13 - 21:54:33 | 200 |      80.166µs |             ::1 | GET      "/favicon.ico"
+[GIN] 2024/11/13 - 21:54:37 | 200 |      93.292µs |             ::1 | GET      "/"
+[GIN] 2024/11/13 - 21:55:01 | 200 |      61.666µs |             ::1 | GET      "/"
+[GIN] 2024/11/13 - 21:58:17 | 200 |      66.833µs |             ::1 | GET      "/"
+[SYS] 2024/11/13 - 22:01:36 | Gin Template v0.0.0 started 
+[SYS] 2024/11/13 - 22:01:36 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/13 - 22:01:36 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/13 - 22:01:37 | 200 |    4.241208ms |             ::1 | GET      "/"
+[GIN] 2024/11/13 - 22:01:37 | 200 |      34.042µs |             ::1 | GET      "/"
+[GIN] 2024/11/13 - 22:01:38 | 200 |      63.709µs |             ::1 | GET      "/"
+[GIN] 2024/11/13 - 22:01:38 | 200 |      52.833µs |             ::1 | GET      "/"
+[SYS] 2024/11/14 - 08:18:34 | Gin Template v0.0.0 started 
+[SYS] 2024/11/14 - 08:18:34 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/14 - 08:18:34 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/14 - 08:18:38 | 200 |    6.882791ms |             ::1 | GET      "/"
+[SYS] 2024/11/14 - 08:21:34 | Gin Template v0.0.0 started 
+[SYS] 2024/11/14 - 08:21:34 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/14 - 08:21:34 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/14 - 08:21:39 | 200 |    4.702625ms |             ::1 | GET      "/"
+[GIN] 2024/11/14 - 08:21:39 | 200 |     662.667µs |             ::1 | GET      "/static/js/5.3544f029.chunk.js"
+[GIN] 2024/11/14 - 08:21:39 | 200 |      175.25µs |             ::1 | GET      "/static/js/main.a12ed90a.chunk.js"
+[GIN] 2024/11/14 - 08:21:39 | 200 |     474.542µs |             ::1 | GET      "/static/js/main.a12ed90a.chunk.js.map"
+[GIN] 2024/11/14 - 08:21:39 | 200 |    3.334291ms |             ::1 | GET      "/static/js/5.3544f029.chunk.js.map"

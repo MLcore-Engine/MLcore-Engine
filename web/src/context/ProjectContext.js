@@ -3,7 +3,7 @@ import { projectAPI } from '../api/projectAPI';
 import { toast } from 'react-toastify';
 
 // Create ProjectContext
-const ProjectContext = createContext();
+const ProjectContext = createContext(null);
 
 // Create a custom Hook to use ProjectContext in components
 export const useProjects = () => {

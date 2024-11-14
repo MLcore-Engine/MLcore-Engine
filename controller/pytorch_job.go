@@ -101,18 +101,18 @@ func CreateTrainingJob(c *gin.Context) {
 
 // createPyTorchJob creates a Kubernetes PyTorchJob and updates the TrainingJob with Kubernetes details
 func createPyTorchJob(k8sClient *services.K8s, job *model.TrainingJob) error {
-	// 设置默认值
+	// set default values
 	if job.Image == "" {
 		return fmt.Errorf("image is empty: %v", job.Image)
 	}
 
-	// 解析 Command 字符串为切片
+	// parse Command string to slice
 	var command []string
 	// if err := json.Unmarshal([]byte(job.Command), &command); err != nil || len(command) == 0 {
 	// 	command = []string{}
 	// }
 
-	// 解析 Args 字符串为切片（可选）
+	// parse Args string to slice (optional)
 	var args []string
 	if job.Args != "" {
 		if err := json.Unmarshal([]byte(job.Args), &args); err != nil {
@@ -120,7 +120,7 @@ func createPyTorchJob(k8sClient *services.K8s, job *model.TrainingJob) error {
 		}
 	}
 
-	// 设置副本数默认值
+	// set default replicas
 	if job.MasterReplicas == 0 {
 		job.MasterReplicas = 1
 	}
@@ -135,7 +135,7 @@ func createPyTorchJob(k8sClient *services.K8s, job *model.TrainingJob) error {
 		job.MemoryLimit = "8Gi"
 	}
 
-	// 解析 NodeSelector 字符串为 map
+	// parse NodeSelector string to map
 	nodeSelector := make(map[string]string)
 	// if job.NodeSelector != "" {
 	// 	if err := json.Unmarshal([]byte(job.NodeSelector), &nodeSelector); err != nil {
@@ -143,7 +143,7 @@ func createPyTorchJob(k8sClient *services.K8s, job *model.TrainingJob) error {
 	// 	}
 	// }
 
-	// 解析 Env 字符串为 EnvVar 切片
+	// parse Env string to EnvVar slice
 	var envVars []services.EnvVar
 	// if job.Env != "" {
 	// 	if err := json.Unmarshal([]byte(job.Env), &envVars); err != nil {
@@ -345,13 +345,13 @@ func ListTrainingJobs(c *gin.Context) {
 
 	// Get total count
 	if err := query.Count(&total).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to count training jobs"})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to count training jobs", "data": nil})
 		return
 	}
 
 	// Get paginated jobs
 	if err := query.Offset(offset).Limit(limit).Find(&jobs).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to retrieve training jobs"})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to retrieve training jobs", "data": nil})
 		return
 	}
 

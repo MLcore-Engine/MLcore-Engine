@@ -25,6 +25,10 @@ notebook:
 
   podType: notebook
 
+
+triton:
+  namespace: triton-serving
+  externalIP: 192.168.12.121
   
 crds:
   workflow:
