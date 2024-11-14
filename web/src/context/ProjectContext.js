@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { projectAPI } from '../api/projectAPI';
 import { toast } from 'react-toastify';
+import react from 'react';
 
-
+console.log('beginning of ProjectContext.js');
 console.log('createContext:', createContext);
-// Create ProjectContext
-const ProjectContext = createContext(null);
+console.log('useContext:', react.version);
+
+
+const ProjectContext = createContext();
 
 // Create a custom Hook to use ProjectContext in components
 export const useProjects = () => {
