@@ -11,7 +11,7 @@
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.2.3",
     "react-router-dom": "^6.3.0",
-    "react-scripts": "^3.0.1",
+    "react-scripts": "^3.4.4",
     "react-template": "^0.4.0",
     "react-toastify": "^8.2.0",
     "react-turnstile": "^1.0.5",
