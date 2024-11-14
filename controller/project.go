@@ -2,6 +2,7 @@ package controller
 
 import (
 	"MLcore-Engine/model"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -140,6 +141,8 @@ func GetProject(c *gin.Context) {
 // @Failure 500 {object} ErrorResponse
 // @Router /project/get-all [get]
 func ListProjects(c *gin.Context) {
+
+	fmt.Println("List Projects")
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 

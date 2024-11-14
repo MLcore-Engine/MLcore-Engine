@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { projectAPI } from '../api/projectAPI';
 import { toast } from 'react-toastify';
 
+
+console.log('createContext:', createContext);
 // Create ProjectContext
 const ProjectContext = createContext(null);
 
