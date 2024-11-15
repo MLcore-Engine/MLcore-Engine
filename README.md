@@ -2,148 +2,240 @@
    <strong>English</strong> | <a href="./README.cn.md">中文</a>
 </p> 
 
-# Machine Learning Platform
+
+# Machine Learning Platform - AIPlatform-MLcore-Engine
 
 [![Go Version](https://img.shields.io/badge/Go-1.20+-blue.svg)]()
 [![React Version](https://img.shields.io/badge/React-18.0+-blue.svg)]()
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)]()
 
-## Overview
+## Project Overview
 
-A Kubernetes-based machine learning platform providing comprehensive model development, training, and deployment workflows. Built with standard Go backend and React frontend architectures for easy adoption and secondary development.
+A scaffolding for AI platform (Machine Learning Platform) that enables quick secondary development, providing model development, training, and deployment processes. Built with Go1.22 + gin-v1.10.0 backend and React18.3 + js frontend architecture, featuring simple frontend-backend interface definitions and data structure definitions.
 
-## Tech Stack
+## Technology Stack
 
 ### Backend
 - Framework: Gin + GORM
-- Storage: MinIO (Object Storage) + MySQL
-- Container: Docker + Kubernetes
+- Storage: MinIO (Object Storage) + SQLITE(or MYSQL)
+- Container: Docker + Kubernetes1.23.6 + Docker-Registry
+- Model Training: Training-Operator
 - Model Serving: Triton Inference Server
-- Monitoring: Prometheus + Grafana
+- Monitoring: Prometheus + Grafana(deploy if needed)
 
 ### Frontend
-- Framework: React 18 + React Router
+- Framework: React 18 + JS(recommended to refactor to TS)
 - UI: Semantic UI React
-- State Management: Redux Toolkit
-- HTTP Client: Axios
+- State Management: Context
+- Request: Axios
 - Charts: Recharts
 
 ## Quick Start
 
-### Prerequisites
-- Go 1.20+
-- Node.js 16+
+### Requirements
+- Go 1.22+
+- Node.js v21.7.3 
 - Docker 20+
-- Kubernetes 1.20+
-- MySQL 8.0+
+- Kubernetes 1.23.6+
+- Npm 10.5.0 
 
 ### Local Development
 
-1. Clone the repository
+1. Clone Project
 ```bash
-git clone https://github.com/your-org/ml-platform.git
+git clone https://gitee.com/oldthree260/mlcore-engine
 cd ml-platform
 ```
 
-2. Start backend
+2. Frontend Build
 ```bash
-cd backend
-go mod tidy
-go run main.go
+cd web
+npm install
+npm run build
 ```
 
-3. Start frontend
+3. Start Go Program
 ```bash
-cd frontend
-npm install
-npm start
+go mod tidy
+go run main
+Access: http:localhost:3000
 ```
+
+### Demo
+<div align="center">
+  <img 
+    src="./docs/output.gif" 
+    alt="Demo"
+    style="width: 80%; max-width: 800px; margin: 20px auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" 
+  />
+</div>
+
+### Detailed Demo
+Watch the full demo video:
+- [Bilibili](https://www.bilibili.com/video/BV1wBmXYyEae)
 
 ## API Documentation
 
 ### Core Data Structures
 
-#### Training Job
+#### Backend Data Structures
 ```go
-type TrainingJob struct {
-    ID              uint      `json:"id"`
-    UserID          uint      `json:"user_id"`
-    ProjectID       uint      `json:"project_id"`
-    Describe        string    `json:"describe"`
-    Namespace       string    `json:"namespace"`
-    Image           string    `json:"image"`
-    ImagePullPolicy string    `json:"image_pull_policy"`
-    RestartPolicy   string    `json:"restart_policy"`
-    Args            []string  `json:"args"`
-    MasterReplicas  int       `json:"master_replicas"`
-    WorkerReplicas  int       `json:"worker_replicas"`
-    GPUsPerNode     int       `json:"gpus_per_node"`
-    CPULimit        string    `json:"cpu_limit"`
-    MemoryLimit     string    `json:"memory_limit"`
-    Status          string    `json:"status"`
-    CreatedAt       time.Time `json:"created_at"`
-    UpdatedAt       time.Time `json:"updated_at"`
+// Each controller uses consistent response and request values
+
+type TrainingJobResponse struct {
+    Success bool              `json:"success" example:"true"`
+    Message string            `json:"message" example:"Training Job created successfully"`
+    Data    model.TrainingJob `json:"data"`
+}
+
+type TrainingJobsResponse struct {
+    Success bool                 `json:"success" example:"true"`
+    Message string               `json:"message" example:""`
+    Data    TrainingJobsListData `json:"data"`
+}
+
+type TrainingJobsListData struct {
+    TrainingJobs []model.TrainingJob `json:"training_jobs"`
+    Total        int64               `json:"total" example:"10"`
+    Page         int                 `json:"page" example:"1"`
+    Limit        int                 `json:"limit" example:"20"`
+}
+
+type SuccessResponse struct {
+    Success bool   `json:"success" example:"true"`
+    Message string `json:"message" example:"Operation successful"`
 }
 ```
 
-#### API Response Format
-```go
-type Response struct {
-    Code    int         `json:"code"`    // Status code
-    Message string      `json:"message"` // Message
-    Data    interface{} `json:"data"`    // Data
-    Total   int64      `json:"total"`   // Total count (for list APIs)
-}
+#### Backend Code Architecture
+
+```shell
+MLcore-Engine/
+├── common/                     # Common utilities
+│   ├── config.go              # Configuration management
+│   ├── constants.go           # Constants definition
+│   ├── crypto.go              # Encryption tools
+│   ├── email.go               # Email functionality
+│   ├── jwt_util.go            # JWT utilities
+│   ├── logger.go              # Logging management
+│   ├── redis.go               # Redis utilities
+│   └── utils.go               # Common utility functions
+│
+├── controller/                 # API controllers
+│   ├── dto.go                 # Data transfer objects
+│   ├── project.go             # Project management
+│   ├── pytorch_job.go         # PyTorch jobs
+│   ├── triton_deploy.go       # Triton deployment
+│   └── user.go                # User management
+│
+├── middleware/                 # Middleware
+│   ├── auth.go                # Authentication middleware
+│   ├── cache.go               # Cache middleware
+│   ├── cors.go                # CORS middleware
+│   └── rate_limit.go          # Rate limiting middleware
+│
+├── model/                     # Data models
+│   ├── file.go               # File model
+│   ├── project.go            # Project model
+│   ├── pytorchjob.go         # PyTorch job model
+│   ├── triton_deploy.go      # Triton deployment model
+│   └── user.go               # User model
+│
+├── router/                    # Route management
+│   ├── api_router.go         # API routes
+│   ├── main.go               # Main router
+│   └── web_router.go         # Web routes
+│
+├── services/                  # Services layer
+│   ├── create_pod.go         # Pod creation service
+│   ├── k8s_util.go           # K8s utilities
+│   ├── pytorch_job_create.go # PyTorch job creation
+│   └── create_triton.go      # Triton service creation
+│
+├── docs/                      # Documentation
+├── upload/                    # Upload directory
+├── vendor/                    # Dependencies
+├── web/                      # Web static resources
+│
+├── config.yaml               # Configuration file
+├── Dockerfile                # Docker build file
+├── go.mod                    # Go module file
+├── go.sum                    # Go dependency version lock
+├── main.go                   # Program entry
+└── README.md                 # Project documentation
 ```
 
-### Main API Endpoints
+#### Frontend Structure
 
-#### Training Jobs
-- `POST /api/v1/training-jobs`: Create training job
-- `GET /api/v1/training-jobs`: Get training job list
-- `GET /api/v1/training-jobs/:id`: Get training job details
-- `PUT /api/v1/training-jobs/:id`: Update training job
-- `DELETE /api/v1/training-jobs/:id`: Delete training job
-
-## Extension Development
-
-### Add New Storage Backend
-Implement the `Storage` interface:
-```go
-type Storage interface {
-    Upload(ctx context.Context, bucket, object string, reader io.Reader) error
-    Download(ctx context.Context, bucket, object string) (io.ReadCloser, error)
-    Delete(ctx context.Context, bucket, object string) error
-}
-```
-
-### Add New Model Server
-Implement the `ModelServer` interface:
-```go
-type ModelServer interface {
-    Deploy(ctx context.Context, model *Model) error
-    Undeploy(ctx context.Context, modelID string) error
-    GetStatus(ctx context.Context, modelID string) (*ModelStatus, error)
-}
+```shell
+web/                           # Frontend root directory
+├── build/                     # Build output directory
+├── public/                    # Static resources directory
+├── src/                      # Source code directory
+│   ├── api/                  # API interfaces
+│   │   ├── notebookAPI.js    # Notebook related APIs
+│   │   ├── projectAPI.js     # Project related APIs
+│   │   ├── trainingAPI.js    # Training related APIs
+│   │   ├── tritonAPI.js      # Triton service APIs
+│   │   └── userAPI.js        # User related APIs
+│   │
+│   ├── components/           # Components directory
+│   │   ├── common/           # Common components
+│   │   ├── Footer/          # Footer component
+│   │   ├── Header/          # Header component
+│   │   ├── sidebars/        # Sidebar components
+│   │   ├── FilesTable.js     # File table component
+│   │   ├── Layout.js         # Layout component
+│   │   ├── Loading.js        # Loading component
+│   │   ├── LoginForm.js      # Login form
+│   │   ├── RegisterForm.js   # Registration form
+│   │   └── ...              # Other components
+│   │
+│   ├── context/             # Context directory
+│   │   ├── Status/          # Status management
+│   │   ├── AuthContext.js   # Authentication context
+│   │   └── ProjectContext.js # Project context
+│   │
+│   ├── pages/               # Pages directory
+│   │   ├── About/           # About page
+│   │   ├── File/            # File management page
+│   │   ├── ModelDevelop/    # Model development page
+│   │   ├── Project/         # Project management page
+│   │   ├── Serving/         # Service deployment page
+│   │   ├── Setting/         # Settings page
+│   │   ├── Training/        # Training page
+│   │   ├── User/            # User page
+│   │   ├── Home.js          # Homepage
+│   │   └── NotFound.js      # 404 page
+│   │
+│   ├── styles/              # Style files directory
+│   ├── constants/           # Constants definition
+│   ├── helpers/             # Helper functions
+│   ├── hooks/               # Custom Hooks
+│   ├── App.js              # Application entry
+│   └── index.js            # Program entry
+│
+├── package.json            # Project dependencies
+├── package-lock.json       # Dependency version lock
+├── .babelrc               # Babel configuration
+├── .gitignore             # Git ignore configuration
+├── Dockerfile             # Docker build file
+└── README.md              # Project documentation
 ```
 
 ## Learning Resources
 
-### Go
-1. [Go Official Documentation](https://golang.org/doc/)
-2. [Go by Example](https://gobyexample.com/)
-3. [Gin Framework Documentation](https://gin-gonic.com/docs/)
-4. [GORM Documentation](https://gorm.io/docs/)
+### Go Gin Tutorials
+1. [Go Quick Tutorial](https://www.runoob.com/go/go-tutorial.html)
+2. [Gin](https://gin-gonic.com/docs/quickstart/)
 
-### React
-1. [React Official Documentation](https://reactjs.org/docs/getting-started.html)
-2. [React Router Documentation](https://reactrouter.com/docs/en/v6)
-3. [Redux Toolkit Documentation](https://redux-toolkit.js.org/)
-4. [Semantic UI React Documentation](https://react.semantic-ui.com/)
+### React JS Tutorials
+1. [React Quick Tutorial](https://www.runoob.com/react/react-tutorial.html)
+2. [JS Quick Tutorial](https://www.runoob.com/js/js-tutorial.html)
 
 ## Contributing
 
-Pull requests and issues are welcome.
+Pull Requests and Issues are welcome.
 
 ## License
 
