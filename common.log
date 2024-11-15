@@ -1,0 +1,23 @@
+[SYS] 2024/11/15 - 09:31:18 | Gin Template v0.0.0 started 
+[SYS] 2024/11/15 - 09:31:18 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/15 - 09:31:18 | REDIS_CONN_STRING not set, Redis is not enabled 
+[GIN] 2024/11/15 - 09:31:28 | 200 |     235.041µs |             ::1 | GET      "/api/status"
+[GIN] 2024/11/15 - 09:31:28 | 200 |    1.177334ms |             ::1 | GET      "/api/project/get-all"
+[GIN] 2024/11/15 - 09:31:31 | 200 |     980.458µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/15 - 09:31:36 | 200 |      84.136ms |             ::1 | POST     "/api/user/login"
+[GIN] 2024/11/15 - 09:32:27 | 200 |     384.875µs |             ::1 | GET      "/api/user/manage/?page=1&limit=10"
+[GIN] 2024/11/15 - 09:32:28 | 200 |         510µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/15 - 09:32:34 | 200 |   63.886667ms |             ::1 | DELETE   "/api/notebook/5"
+[GIN] 2024/11/15 - 09:32:34 | 200 |     843.125µs |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/15 - 09:32:51 | 200 |  1.085548542s |             ::1 | POST     "/api/notebook/"
+[GIN] 2024/11/15 - 09:32:51 | 200 |    1.007333ms |             ::1 | GET      "/api/notebook/get-all?page=1&limit=10"
+[GIN] 2024/11/15 - 09:32:56 | 200 |     676.875µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/15 - 09:33:01 | 200 |   37.806875ms |             ::1 | DELETE   "/api/pytorchtrain/6"
+[GIN] 2024/11/15 - 09:33:01 | 200 |     789.834µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/15 - 09:33:27 | 200 |  1.036214875s |             ::1 | POST     "/api/pytorchtrain/"
+[GIN] 2024/11/15 - 09:33:27 | 200 |      276.75µs |             ::1 | GET      "/api/pytorchtrain/get-all?page=1&limit=10"
+[GIN] 2024/11/15 - 09:33:34 | 200 |     545.917µs |             ::1 | GET      "/api/triton/get-all?page=1&limit=10"
+[GIN] 2024/11/15 - 09:33:39 | 200 |   52.401125ms |             ::1 | DELETE   "/api/triton/6"
+[GIN] 2024/11/15 - 09:33:39 | 200 |     883.292µs |             ::1 | GET      "/api/triton/get-all?page=1&limit=10"
+[GIN] 2024/11/15 - 09:33:49 | 200 |  1.057339416s |             ::1 | POST     "/api/triton/"
+[GIN] 2024/11/15 - 09:33:49 | 200 |     645.833µs |             ::1 | GET      "/api/triton/get-all?page=1&limit=10"

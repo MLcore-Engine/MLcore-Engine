@@ -12,7 +12,7 @@ import (
 type User struct {
 	gorm.Model
 	Username         string     `json:"username" gorm:"uniqueIndex;not null" validate:"required,max=12"`
-	Password         string     `json:"-" gorm:"not null" validate:"required,min=8,max=20"` // 使用 json:"-" 在JSON中隐藏密码
+	Password         string     `json:"-" gorm:"not null" validate:"required,min=8,max=20"` // use json:"-" to hide password in JSON
 	DisplayName      string     `json:"display_name" gorm:"index" validate:"max=20"`
 	Role             int        `json:"role" gorm:"type:int;default:1"`   // 1000: root, 100: admin, 1: common
 	Status           int        `json:"status" gorm:"type:int;default:1"` // 1: enabled, 0: disabled

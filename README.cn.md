@@ -2,7 +2,7 @@
    <strong>中文</strong> | <a href="./README.md">English</a>
 </p> 
 
-# 机器学习平台
+# 机器学习平台-AIPlatform-MLcore-Engine
 
 [![Go Version](https://img.shields.io/badge/Go-1.20+-blue.svg)]()
 [![React Version](https://img.shields.io/badge/React-18.0+-blue.svg)]()
@@ -10,54 +10,57 @@
 
 ## 项目简介
 
-这是一个基于 Kubernetes 的机器学习平台，提供完整的模型开发、训练和部署流程。采用标准的 Go 后端和 React 前端架构，便于快速上手和二次开发。
+一个可以快速上手二次开发的AI平台(机器学习平台)脚手架，提供了模型开发、训练和部署流程。采用Go1.22 + gin-v1.10.0后端和 React18.3 + js 前端架构，简单的前后端接口定义和数据结构定义。
 
 ## 技术栈
 
 ### 后端
 - 框架：Gin + GORM
-- 存储：MinIO (对象存储) + MySQL
-- 容器：Docker + Kubernetes
+- 存储：MinIO (对象存储) + SQLITE(or MYSQL)
+- 容器：Docker + Kubernetes1.23.6
 - 模型服务：Triton Inference Server
-- 监控：Prometheus + Grafana
+- 监控：Prometheus + Grafana(需要则部署)
 
 ### 前端
-- 框架：React 18 + React Router
+- 框架：React 18 + JS(建议重构为TS)
 - UI：Semantic UI React
-- 状态管理：Redux Toolkit
+- 状态管理：Context
 - 请求：Axios
 - 图表：Recharts
 
 ## 快速开始
 
 ### 环境要求
-- Go 1.20+
-- Node.js 16+
+- Go 1.22+
+- Node.js v21.7.3 
 - Docker 20+
-- Kubernetes 1.20+
-- MySQL 8.0+
+- Kubernetes 1.23.6+
+- Npm 10.5.0 
+
 
 ### 本地开发
 
 1. 克隆项目
 ```bash
-git clone https://github.com/your-org/ml-platform.git
+git clone https://gitee.com/oldthree260/mlcore-engine
 cd ml-platform
 ```
 
-2. 启动后端
+2. 前端构建
 ```bash
-cd backend
-go mod tidy
-go run main.go
+cd web
+npm install
+npm run build
 ```
 
-3. 启动前端
+3. 启动Go程序
 ```bash
-cd frontend
-npm install
-npm start
+go mod tidy
+go run main
+访问： http:localhost:3000
 ```
+
+![演示](./docs/output.gif)
 
 ## API 文档
 
