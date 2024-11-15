@@ -70,6 +70,10 @@ go run main
   />
 </div>
 
+### 详细演示
+查看完整演示视频：
+- [哔哩哔哩](https://www.bilibili.com/video/BV1wBmXYyEae)
+
 ## API 文档
 
 ### 核心数据结构
@@ -104,7 +108,7 @@ type SuccessResponse struct {
 }
 
 ```
-####后端代码架构
+#### 后端代码架构
 
 ```shell
 MLcore-Engine/
