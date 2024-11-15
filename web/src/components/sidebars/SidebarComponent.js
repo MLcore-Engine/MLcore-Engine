@@ -19,12 +19,15 @@ const SidebarComponent = () => {
     if (location.pathname.startsWith('/training')) {
       return <ModelTrainingSidebar />;
     }
-    return null;
-  };
 
     if (location.pathname.startsWith('/serving')) {
       return <ModelServingSidebar />;
     }
+    
+    return null;
+  };
+
+
 
   const sidebarContent = renderSidebar();
 

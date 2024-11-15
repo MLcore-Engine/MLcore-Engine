@@ -12,7 +12,8 @@ const Layout = () => {
   const hasSidebar = (
     location.pathname.startsWith('/project/') ||
     location.pathname.startsWith('/notebook') ||
-    location.pathname.startsWith('/training')
+    location.pathname.startsWith('/training') ||
+    location.pathname.startsWith('/serving')
   );
 
   return (

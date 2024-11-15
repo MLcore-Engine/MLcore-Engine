@@ -1,4 +1,4 @@
-From gaoxin2020/aiplatform:base
+FROM gaoxin2020/aiplatform:base
 
 
 WORKDIR /app
