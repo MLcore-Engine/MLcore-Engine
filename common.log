@@ -9,3 +9,7 @@
 [GIN] 2024/11/14 - 16:33:18 | 200 |      2.9655ms |             ::1 | GET      "/static/js/5.3544f029.chunk.js.map"
 [GIN] 2024/11/14 - 16:33:18 | 200 |    3.414292ms |             ::1 | GET      "/static/css/5.596f8d7d.chunk.css.map"
 [GIN] 2024/11/14 - 16:33:18 | 200 |     152.875µs |             ::1 | GET      "/favicon.ico"
+[SYS] 2024/11/15 - 01:22:43 | Gin Template v0.0.0 started 
+[SYS] 2024/11/15 - 01:22:43 | SQL_DSN not set, using SQLite as database 
+[SYS] 2024/11/15 - 01:22:43 | no user exists, create a root user for you: username is root, password is 123456 
+[SYS] 2024/11/15 - 01:22:43 | REDIS_CONN_STRING not set, Redis is not enabled 

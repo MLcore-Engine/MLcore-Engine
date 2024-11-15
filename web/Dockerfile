@@ -20,7 +20,7 @@ WORKDIR /app
 
 # 复制 package.json 和 package-lock.json（如果存在）
 COPY package.json ./
-COPY package-lock.json ./
+
 
 # 安装 npm 依赖
 RUN npm install
