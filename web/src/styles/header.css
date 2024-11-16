@@ -1,0 +1,8 @@
+.ui.menu a.item:hover {
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.03);
+  color: #133e87;
+}
+.ui.menu .ui.dropdown .menu > .item:hover {
+  color: #133e87 !important;
+}

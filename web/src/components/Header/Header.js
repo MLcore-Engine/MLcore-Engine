@@ -5,6 +5,8 @@ import { GIT_REPO_URL } from '../../constants/common.constant';
 import { Menu, Dropdown, Icon, Container } from 'semantic-ui-react';
 import { getSystemName, isAdmin } from '../../helpers';
 import 'semantic-ui-css/semantic.min.css';
+import '../../styles/header.css';
+
 
 const headerButtons = [
   {

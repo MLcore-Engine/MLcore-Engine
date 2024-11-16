@@ -16,7 +16,8 @@
     "react-toastify": "^8.2.0",
     "react-turnstile": "^1.0.5",
     "semantic-ui-css": "^2.5.0",
-    "semantic-ui-react": "^2.1.5"
+    "semantic-ui-react": "^2.1.5",
+    "styled-components": "^6.1.13"
   },
   "scripts": {
     "start": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",

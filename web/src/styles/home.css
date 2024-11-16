@@ -1,0 +1,7 @@
+.ui.segment {
+    box-shadow: none;
+    border: 1px solid transparent;
+}
+.ui.grid>.column:not(.row), .ui.grid>.row>.column{
+    padding-right: 0;
+}
