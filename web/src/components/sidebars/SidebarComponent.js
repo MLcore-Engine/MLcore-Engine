@@ -36,7 +36,7 @@ const SidebarComponent = () => {
   }
 
   return (
-    <div style={{ width: '250px', height: '100%', overflowY: 'auto' }}>
+    <div  style={{ width: '250px', minHeight: 'calc(100vh - 180px)', overflowY: 'auto' }} >
       {sidebarContent}
     </div>
   );
