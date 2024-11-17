@@ -38,7 +38,7 @@ const Home = () => {
           textAlign='center'
           className='text-3xl font-bold text-gray-900 mb-8'
         >
-          <div style={{ color: primaryColor }}>机器学习平台工作流程</div>
+          <div style={{ color: primaryColor }}>MLcore-Engine workflow</div>
         </SemanticHeader>
 
         <Grid container stackable>
@@ -46,42 +46,42 @@ const Home = () => {
           <Grid.Row>
             <Grid.Column width={16}>
               <Segment>
-                <SemanticHeader as='h3'>用户操作</SemanticHeader>
+                <SemanticHeader as='h3'>User Operations</SemanticHeader>
                 <Grid columns={5} divided>
                   <Grid.Row>
                     <Grid.Column>
                       <ProcessStep
                         icon='folder open'
-                        title='项目创建/管理'
-                        description='创建和管理项目空间'
+                        title='Project Creation/Management'
+                        description='Create and manage project spaces'
                       />
                     </Grid.Column>
                     <Grid.Column>
                       <ProcessStep
                         icon='upload'
-                        title='数据上传'
-                        description='上传训练数据集'
+                        title='Data Upload'
+                        description='Upload training datasets'
                       />
                     </Grid.Column>
                     <Grid.Column>
                       <ProcessStep
                         icon='code'
-                        title='模型开发'
-                        description='开发和调试模型'
+                        title='Model Development'
+                        description='Develop and debug models'
                       />
                     </Grid.Column>
                     <Grid.Column>
                       <ProcessStep
                         icon='play'
-                        title='训练任务提交'
-                        description='提交和管理训练任务'
+                        title='Training Task Submission'
+                        description='Submit and manage training tasks'
                       />
                     </Grid.Column>
                     <Grid.Column>
                       <ProcessStep
                         icon='server'
-                        title='模型部署请求'
-                        description='部署模型为服务'
+                        title='Model Deployment Request'
+                        description='Deploy models as services'
                       />
                     </Grid.Column>
                   </Grid.Row>
@@ -96,14 +96,14 @@ const Home = () => {
           <Grid.Row>
             <Grid.Column width={16}>
               <Segment>
-                <SemanticHeader as='h3'>数据存储层</SemanticHeader>
+                <SemanticHeader as='h3'>Data Storage Layer</SemanticHeader>
                 <Grid columns={2} divided>
                   <Grid.Row>
                     <Grid.Column>
                       <ProcessStep
                         icon='database'
-                        title='MinIO对象存储'
-                        description='存储训练数据和模型文件'
+                        title='MinIO Object Storage'
+                        description='Store training data and model files'
                         color='#3B1E54'
                       />
                     </Grid.Column>
@@ -111,7 +111,7 @@ const Home = () => {
                       <ProcessStep
                         icon='docker'
                         title='Docker Registry'
-                        description='存储容器镜像'
+                        description='Store container images'
                         color='#3B1E54'
                       />
                     </Grid.Column>
@@ -123,26 +123,26 @@ const Home = () => {
 
           <ArrowIcon />
 
-          {/* Kubernetes集群 */}
+          {/* Kubernetes Cluster */}
           <Grid.Row>
             <Grid.Column width={16}>
               <Segment>
-                <SemanticHeader as='h3'>Kubernetes集群</SemanticHeader>
+                <SemanticHeader as='h3'>Kubernetes Cluster</SemanticHeader>
                 <Grid columns={4} divided>
                   <Grid.Row>
                     <Grid.Column>
                       <ProcessStep
                         icon='settings'
                         title='Training Operator'
-                        description='管理训练任务'
+                        description='Manage training tasks'
                         color='#31511E'
                       />
                     </Grid.Column>
                     <Grid.Column>
                       <ProcessStep
                         icon='microchip'
-                        title='训练Pod'
-                        description='执行模型训练'
+                        title='Training Pod'
+                        description='Execute model training'
                         color='#31511E'
                       />
                     </Grid.Column>
@@ -150,15 +150,15 @@ const Home = () => {
                       <ProcessStep
                         icon='server'
                         title='Triton Inference Server'
-                        description='提供推理服务'
+                        description='Provide inference services'
                         color='#31511E'
                       />
                     </Grid.Column>
                     <Grid.Column>
                       <ProcessStep
                         icon='cogs'
-                        title='模型服务Pod'
-                        description='运行推理服务'
+                        title='Model Serving Pod'
+                        description='Run inference services'
                         color='#31511E'
                       />
                     </Grid.Column>
@@ -177,30 +177,30 @@ const Home = () => {
                 <Grid.Row>
                   <Grid.Column>
                     <Segment>
-                      <SemanticHeader as='h3'>模型管理</SemanticHeader>
+                      <SemanticHeader as='h3'>Model Management</SemanticHeader>
                       <Grid columns={3} divided>
                         <Grid.Row>
                           <Grid.Column>
                             <ProcessStep
                               icon='chart bar'
                               title='MLflow'
-                              description='模型生命周期管理'
+                              description='Model lifecycle management'
                               color='#1A1A19'
                             />
                           </Grid.Column>
                           <Grid.Column>
                             <ProcessStep
                               icon='history'
-                              title='模型版本控制'
-                              description='版本管理与追踪'
+                              title='Model Version Control'
+                              description='Version management and tracking'
                               color='#1A1A19'
                             />
                           </Grid.Column>
                           <Grid.Column>
                             <ProcessStep
                               icon='line graph'
-                              title='模型指标追踪'
-                              description='性能指标监控'
+                              title='Model Metrics Tracking'
+                              description='Performance metrics monitoring'
                               color='#1A1A19'
                             />
                           </Grid.Column>
@@ -210,14 +210,14 @@ const Home = () => {
                   </Grid.Column>
                   <Grid.Column>
                     <Segment>
-                      <SemanticHeader as='h3'>监控系统</SemanticHeader>
+                      <SemanticHeader as='h3'>Monitoring System</SemanticHeader>
                       <Grid columns={3} divided>
                         <Grid.Row>
                           <Grid.Column>
                             <ProcessStep
                               icon='eye'
                               title='Prometheus'
-                              description='指标收集'
+                              description='Metrics collection'
                               color='#2A3663'
                             />
                           </Grid.Column>
@@ -225,7 +225,7 @@ const Home = () => {
                             <ProcessStep
                               icon='dashboard'
                               title='Grafana'
-                              description='可视化监控'
+                              description='Visualization monitoring'
                               color='#2A3663'
                             />
                           </Grid.Column>
@@ -233,7 +233,7 @@ const Home = () => {
                             <ProcessStep
                               icon='file alternate'
                               title='EFK Stack'
-                              description='日志管理'
+                              description='Log management'
                               color='#2A3663'
                             />
                           </Grid.Column>
