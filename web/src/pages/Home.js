@@ -8,8 +8,16 @@ import {
   Card,
 } from 'semantic-ui-react';
 import '../styles/home.css';
+
+
 const cardStyle = {
   border: 'none',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影
+  borderRadius: '8px', // 卡片圆角
+  minHeight: '120px', // 设置统一的最小高度
+  display: 'flex', // 启用 flex 布局
+  flexDirection: 'column', // 内容垂直排列
+  justifyContent: 'center', // 垂直居中
 };
 const ProcessStep = ({ icon, title, description, color = '#133e87' }) => (
   <Card fluid style={cardStyle}>
