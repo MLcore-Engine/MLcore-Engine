@@ -178,3 +178,4 @@ tritonserver \
   - 包含部署列表和创建部署等链接
 
 Triton官方文档： https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/contents.html
+备注：有必要在模型部署前使用model-analyzer工具对模型进行优化 https://github.com/triton-inference-server/tutorials/tree/main/Conceptual_Guide/Part_3-optimizing_triton_configuration
