@@ -4,3 +4,9 @@ upload
 *.db
 build
 vendor
+common.log
+error.log
+MLcore-Engine.db
+*.log
+*.log.*
+*.log.*.*
