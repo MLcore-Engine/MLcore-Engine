@@ -2,35 +2,58 @@ package model
 
 import (
 	"errors"
-	"time"
 
 	"gorm.io/gorm"
 )
 
 type TritonDeploy struct {
-	ID           uint           `json:"id" gorm:"primaryKey"`
-	UserID       uint           `json:"user_id" gorm:"not null;index;constraint:OnDelete:RESTRICT"`
-	User         User           `json:"user" gorm:"foreignKey:UserID;references:ID"`
-	ProjectID    uint           `json:"project_id" gorm:"not null;index;constraint:OnDelete:RESTRICT"`
-	Project      Project        `json:"project" gorm:"foreignKey:ProjectID;references:ID"`
-	Name         string         `json:"name" gorm:"size:200;unique"`
-	Image        string         `json:"image" gorm:"size:200;default:'nvcr.io/nvidia/tritonserver:20.12-py3'"`
-	Replicas     int32          `json:"replicas" gorm:"default:1"`
-	Ports        string         `json:"ports" gorm:"type:json"`         // JSON-encoded ports
-	Labels       string         `json:"labels" gorm:"type:json"`        // JSON-encoded labels
-	VolumeMounts string         `json:"volume_mounts" gorm:"type:json"` // JSON-encoded volume mounts
-	Resources    string         `json:"resources" gorm:"type:json"`     // JSON-encoded resources
-	Command      string         `json:"command" gorm:"type:text"`       // Command to run
-	Args         string         `json:"args" gorm:"type:text"`          // Arguments for the command
-	CPU          int64          `json:"cpu" gorm:"default:2"`
-	Memory       int64          `json:"memory" gorm:"default:4"`
-	GPU          int64          `json:"gpu" gorm:"default:0"`
-	Namespace    string         `json:"namespace" gorm:"size:200;default:'triton-serving'"`
-	Status       string         `json:"status" gorm:"size:200;default:'Creating'"`
-	AccessURL    string         `json:"access_url"`
-	CreatedAt    time.Time      `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt    time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
-	DeletedAt    gorm.DeletedAt `json:"-" gorm:"index"`
+	gorm.Model
+	Name      string  `json:"name" gorm:"size:200;unique"`
+	Namespace string  `json:"namespace" gorm:"size:200;default:'triton-serving'"`
+	Image     string  `json:"image" gorm:"size:200"`
+	Replicas  int32   `json:"replicas" gorm:"default:1"`
+	CPU       int64   `json:"cpu" gorm:"default:2"`
+	Memory    int64   `json:"memory" gorm:"default:4"`
+	GPU       int64   `json:"gpu" gorm:"default:0"`
+	Status    string  `json:"status" gorm:"size:200;default:'Creating'"`
+	Labels    string  `json:"labels" gorm:"type:json"`
+	Ports     string  `json:"ports" gorm:"type:json"`
+	AccessURL string  `json:"access_url"`
+	UserID    uint    `json:"user_id" gorm:"not null;index;constraint:OnDelete:RESTRICT"`
+	User      User    `json:"user" gorm:"foreignKey:UserID;references:ID"`
+	ProjectID uint    `json:"project_id" gorm:"not null;index;constraint:OnDelete:RESTRICT"`
+	Project   Project `json:"project" gorm:"foreignKey:ProjectID;references:ID"`
+
+	// Server Configuration
+	ModelRepository          string `json:"model_repository" gorm:"default:'/model'"`
+	StrictModelConfig        bool   `json:"strict_model_config" gorm:"default:false"`
+	AllowPollModelRepository bool   `json:"allow_poll_model_repository" gorm:"default:false"`
+	PollRepoSeconds          int    `json:"poll_repo_seconds" gorm:"default:5"`
+
+	// HTTP Configuration
+	HttpPort        int  `json:"http_port" gorm:"default:8000"`
+	HttpThreadCount int  `json:"http_thread_count" gorm:"default:8"`
+	AllowHttp       bool `json:"allow_http" gorm:"default:true"`
+
+	// gRPC Configuration
+	GrpcPort                    int  `json:"grpc_port" gorm:"default:8001"`
+	GrpcInferAllocationPoolSize int  `json:"grpc_infer_allocation_pool_size" gorm:"default:100"`
+	AllowGrpc                   bool `json:"allow_grpc" gorm:"default:true"`
+
+	// Metrics Configuration
+	AllowMetrics      bool `json:"allow_metrics" gorm:"default:true"`
+	MetricsPort       int  `json:"metrics_port" gorm:"default:8002"`
+	MetricsIntervalMs int  `json:"metrics_interval_ms" gorm:"default:2000"`
+
+	// GPU Configuration
+	GpuMemoryFraction             float64 `json:"gpu_memory_fraction" gorm:"default:1.0"`
+	MinSupportedComputeCapability float64 `json:"min_supported_compute_capability" gorm:"default:6.0"`
+
+	// Logging Configuration
+	LogVerbose int  `json:"log_verbose" gorm:"default:0"`
+	LogInfo    bool `json:"log_info" gorm:"default:true"`
+	LogWarning bool `json:"log_warning" gorm:"default:true"`
+	LogError   bool `json:"log_error" gorm:"default:true"`
 }
 
 // Insert creates a new TritonDeploy

@@ -67,7 +67,35 @@ func CreateTritonDeploy(c *gin.Context) {
 		return
 	}
 
-	// Generate Deployment and Service configurations
+	// 创建 Triton 配置
+	tritonConfig := services.TritonConfig{
+		ModelRepository:          deploy.ModelRepository,
+		StrictModelConfig:        deploy.StrictModelConfig,
+		AllowPollModelRepository: deploy.AllowPollModelRepository,
+		PollRepoSeconds:          deploy.PollRepoSeconds,
+
+		HttpPort:        deploy.HttpPort,
+		HttpThreadCount: deploy.HttpThreadCount,
+		AllowHttp:       deploy.AllowHttp,
+
+		GrpcPort:                    deploy.GrpcPort,
+		GrpcInferAllocationPoolSize: deploy.GrpcInferAllocationPoolSize,
+		AllowGrpc:                   deploy.AllowGrpc,
+
+		AllowMetrics:      deploy.AllowMetrics,
+		MetricsPort:       deploy.MetricsPort,
+		MetricsIntervalMs: deploy.MetricsIntervalMs,
+
+		GpuMemoryFraction:             deploy.GpuMemoryFraction,
+		MinSupportedComputeCapability: deploy.MinSupportedComputeCapability,
+
+		LogVerbose: deploy.LogVerbose,
+		LogInfo:    deploy.LogInfo,
+		LogWarning: deploy.LogWarning,
+		LogError:   deploy.LogError,
+	}
+
+	// 生成部署配置
 	deploymentConfig, err := services.GetTritonDeployment(
 		deploy.Name,
 		deploy.Namespace,
@@ -78,6 +106,7 @@ func CreateTritonDeploy(c *gin.Context) {
 		deploy.Memory,
 		deploy.GPU,
 		viper.GetString("triton.mountPath"),
+		tritonConfig,
 	)
 
 	if err != nil {
@@ -196,14 +225,44 @@ func UpdateTritonDeploy(c *gin.Context) {
 		return
 	}
 
-	// Update fields
+	// 更新字段
 	deploy.Image = updateData.Image
 	deploy.Replicas = updateData.Replicas
 	deploy.Ports = updateData.Ports
-	deploy.VolumeMounts = updateData.VolumeMounts
-	deploy.Resources = updateData.Resources
-	deploy.Command = updateData.Command
-	deploy.Args = updateData.Args
+	deploy.CPU = updateData.CPU
+	deploy.Memory = updateData.Memory
+	deploy.GPU = updateData.GPU
+
+	// 更新 Server 配置
+	deploy.ModelRepository = updateData.ModelRepository
+	deploy.StrictModelConfig = updateData.StrictModelConfig
+	deploy.AllowPollModelRepository = updateData.AllowPollModelRepository
+	deploy.PollRepoSeconds = updateData.PollRepoSeconds
+
+	// 更新 HTTP 配置
+	deploy.HttpPort = updateData.HttpPort
+	deploy.HttpThreadCount = updateData.HttpThreadCount
+	deploy.AllowHttp = updateData.AllowHttp
+
+	// 更新 gRPC 配置
+	deploy.GrpcPort = updateData.GrpcPort
+	deploy.GrpcInferAllocationPoolSize = updateData.GrpcInferAllocationPoolSize
+	deploy.AllowGrpc = updateData.AllowGrpc
+
+	// 更新 Metrics 配置
+	deploy.AllowMetrics = updateData.AllowMetrics
+	deploy.MetricsPort = updateData.MetricsPort
+	deploy.MetricsIntervalMs = updateData.MetricsIntervalMs
+
+	// 更新 GPU 配置
+	deploy.GpuMemoryFraction = updateData.GpuMemoryFraction
+	deploy.MinSupportedComputeCapability = updateData.MinSupportedComputeCapability
+
+	// 更新日志配置
+	deploy.LogVerbose = updateData.LogVerbose
+	deploy.LogInfo = updateData.LogInfo
+	deploy.LogWarning = updateData.LogWarning
+	deploy.LogError = updateData.LogError
 
 	if err := deploy.Update(); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
@@ -394,6 +453,43 @@ func ListTritonDeploys(c *gin.Context) {
 			Page:        page,
 			Limit:       limit,
 		},
+	})
+}
+
+// GetTritonConfig godoc
+// @Summary Get Triton configuration from config file
+// @Description Get all available Triton configuration options from config.yaml
+// @Tags triton
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /api/v1/triton/config [get]
+func GetTritonConfig(c *gin.Context) {
+	config := map[string]interface{}{
+		"namespace":  viper.GetString("triton.namespace"),
+		"externalIP": viper.GetString("triton.externalIP"),
+		"images":     viper.GetStringSlice("triton.images"),
+		"resources": map[string]interface{}{
+			"cpu":    viper.GetStringMap("triton.resources.cpu"),
+			"memory": viper.GetStringMap("triton.resources.memory"),
+			"gpu":    viper.GetStringMap("triton.resources.gpu"),
+		},
+		"ports": map[string]interface{}{
+			"http":    viper.GetIntSlice("triton.ports.http"),
+			"grpc":    viper.GetIntSlice("triton.ports.grpc"),
+			"metrics": viper.GetIntSlice("triton.ports.metrics"),
+		},
+		"backend":          viper.GetStringSlice("triton.backend"),
+		"model_repository": viper.GetStringSlice("triton.model_repository"),
+		"logging": map[string]interface{}{
+			"verbose": viper.GetIntSlice("triton.logging.verbose"),
+			"formats": viper.GetStringSlice("triton.logging.formats"),
+		},
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Triton configuration retrieved successfully",
+		"data":    config,
 	})
 }
 
