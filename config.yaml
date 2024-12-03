@@ -29,7 +29,38 @@ notebook:
 triton:
   namespace: triton-serving
   externalIP: 192.168.12.121
-  
+  images:
+    - 192.168.12.121:5005/traning/triton:24.10-py3
+    - 192.168.12.121:5005/traning/triton:23.10-py3
+  resources:
+    cpu:
+      small: 2
+      medium: 4
+      large: 8
+    memory:
+      small: 4
+      medium: 8
+      large: 16
+    gpu:
+      none: 0
+      single: 1
+      multi: 2
+  ports:
+    http: [8000, 8080, 8888]
+    grpc: [8001, 8081, 8889]
+    metrics: [8002, 8082, 8890]
+  backend:
+    - tensorrt
+    - onnx
+    - pytorch
+  model_repository:
+    - /model
+    - /models
+    - /workspace/models
+  logging:
+    verbose: [0, 1, 2, 3]
+    formats: ["default", "json"]
+
 crds:
   workflow:
     group: argoproj.io
@@ -37,80 +68,18 @@ crds:
     plural: workflows
     kind: Workflow
     timeout: 6060242
-  mpijob:
-    group: kubeflow.org
-    version: v1
-    plural: mpijobs
-    kind: MPIJob
-    timeout: 172800
+
   tfjob:
     group: kubeflow.org
     version: v1
     plural: tfjobs
     kind: TFJob
     timeout: 6060242
-  xgbjob:
-    group: xgboostjob.kubeflow.org
-    version: v1alpha1
-    plural: xgboostjobs
-    timeout: 1212048
-  experiment:
-    group: kubeflow.org
-    version: v1alpha3
-    plural: experiments
-    kind: Experiment
-    timeout: 172800
+
   pytorchjob:
     group: kubeflow.org
     version: v1
     kind: PyTorchJob
     plural: pytorchjobs
     timeout: 172800
-  notebook:
-    group: kubeflow.org
-    version: v1
-    plural: notebooks
-    kind: Notebook
-    timeout: 172800
-  inferenceservice:
-    group: serving.kserve.io
-    version: v1beta1
-    plural: inferenceservices
-    kind: InferenceService
-    timeout: 86400
-  virtualservice:
-    group: networking.istio.io
-    version: v1alpha3
-    plural: virtualservices
-    kind: VirtualService
-    timeout: 86400
-  framework:
-    group: frameworkcontroller.microsoft.com
-    version: v1
-    plural: frameworks
-    kind: Framework
-    timeout: 172800
-  vcjob:
-    group: batch.volcano.sh
-    version: v1alpha1
-    kind: Job
-    plural: jobs
-    timeout: 172800
-  sparkjob:
-    group: sparkoperator.k8s.io
-    version: v1beta2
-    kind: SparkApplication
-    plural: sparkapplications
-    timeout: 172800
-  paddlejob:
-    group: batch.paddlepaddle.org
-    version: v1
-    kind: PaddleJob
-    plural: paddlejobs
-    timeout: 172800
-  mxjob:
-    group: kubeflow.org
-    version: v1
-    kind: MXJob
-    plural: mxjobs
-    timeout: 172800
+

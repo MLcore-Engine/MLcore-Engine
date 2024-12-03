@@ -1,4 +1,5 @@
 import { API } from '../helpers/api';
+import axios from 'axios';
 
 const BASE_URL = '/api/triton';
 
@@ -68,6 +69,29 @@ export const tritonAPI = {
     } catch (error) {
       console.error('API Error in updateTritonDeploy:', error);
       throw new Error(error.response?.data?.message || 'Failed to update Triton deployment');
+    }
+  },
+
+  /**
+   * Get Triton configuration
+   */
+  getTritonConfig: async () => {
+    try {
+      const response = await API.get(`${BASE_URL}/config`);
+      console.log('API response:', response);
+      
+      if (response.data.success) {
+        return {
+          success: response.data.success,
+          data: response.data.data,
+          message: response.data.message
+        };
+      }
+      
+      throw new Error(response.data.message || 'Failed to fetch Triton configuration');
+    } catch (error) {
+      console.error('API Error in getTritonConfig:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch Triton configuration');
     }
   }
 };

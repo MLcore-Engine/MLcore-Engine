@@ -11,12 +11,94 @@ import (
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 )
 
+type TritonConfig struct {
+	// Server Configuration
+	ModelRepository          string `json:"model_repository"`
+	StrictModelConfig        bool   `json:"strict_model_config"`
+	AllowPollModelRepository bool   `json:"allow_poll_model_repository"`
+	PollRepoSeconds          int    `json:"poll_repo_seconds"`
+
+	// HTTP Configuration
+	HttpPort        int  `json:"http_port"`
+	HttpThreadCount int  `json:"http_thread_count"`
+	AllowHttp       bool `json:"allow_http"`
+
+	// gRPC Configuration
+	GrpcPort                    int  `json:"grpc_port"`
+	GrpcInferAllocationPoolSize int  `json:"grpc_infer_allocation_pool_size"`
+	AllowGrpc                   bool `json:"allow_grpc"`
+
+	// Metrics Configuration
+	AllowMetrics      bool `json:"allow_metrics"`
+	MetricsPort       int  `json:"metrics_port"`
+	MetricsIntervalMs int  `json:"metrics_interval_ms"`
+
+	// GPU Configuration
+	GpuMemoryFraction             float64 `json:"gpu_memory_fraction"`
+	MinSupportedComputeCapability float64 `json:"min_supported_compute_capability"`
+
+	// Logging Configuration
+	LogVerbose int  `json:"log_verbose"`
+	LogInfo    bool `json:"log_info"`
+	LogWarning bool `json:"log_warning"`
+	LogError   bool `json:"log_error"`
+}
+
 // GetTritonDeployment returns the Deployment object for Triton Server without InitContainer and Volumes
-func GetTritonDeployment(name, namespace, image string, replicas int32, labels string, cpu, memory, gpu int64, mountPath string) (*appsv1.Deployment, error) {
+func GetTritonDeployment(name, namespace, image string, replicas int32, labels string, cpu, memory, gpu int64, mountPath string, config TritonConfig) (*appsv1.Deployment, error) {
 	// Parse labels string to map
 	var labelsMap map[string]string
 	if err := json.Unmarshal([]byte(labels), &labelsMap); err != nil {
 		return nil, fmt.Errorf("failed to parse labels: %v", err)
+	}
+
+	args := []string{
+		fmt.Sprintf("--model-repository=%s", config.ModelRepository),
+		fmt.Sprintf("--strict-model-config=%t", config.StrictModelConfig),
+	}
+
+	if config.AllowPollModelRepository {
+		args = append(args, "--allow-poll-model-repository=true")
+		args = append(args, fmt.Sprintf("--poll-repo-seconds=%d", config.PollRepoSeconds))
+	}
+
+	// HTTP Configuration
+	if config.AllowHttp {
+		args = append(args, "--allow-http=true")
+		args = append(args, fmt.Sprintf("--http-port=%d", config.HttpPort))
+		args = append(args, fmt.Sprintf("--http-thread-count=%d", config.HttpThreadCount))
+	}
+
+	// gRPC Configuration
+	if config.AllowGrpc {
+		args = append(args, "--allow-grpc=true")
+		args = append(args, fmt.Sprintf("--grpc-port=%d", config.GrpcPort))
+		args = append(args, fmt.Sprintf("--grpc-infer-allocation-pool-size=%d", config.GrpcInferAllocationPoolSize))
+	}
+
+	// Metrics Configuration
+	if config.AllowMetrics {
+		args = append(args, "--allow-metrics=true")
+		args = append(args, fmt.Sprintf("--metrics-port=%d", config.MetricsPort))
+		args = append(args, fmt.Sprintf("--metrics-interval-ms=%d", config.MetricsIntervalMs))
+	}
+
+	// GPU Configuration
+	if gpu > 0 {
+		args = append(args, fmt.Sprintf("--gpu-memory-fraction=%.2f", config.GpuMemoryFraction))
+		args = append(args, fmt.Sprintf("--min-supported-compute-capability=%.1f", config.MinSupportedComputeCapability))
+	}
+
+	// Logging Configuration
+	args = append(args, fmt.Sprintf("--log-verbose=%d", config.LogVerbose))
+	if config.LogInfo {
+		args = append(args, "--log-info=true")
+	}
+	if config.LogWarning {
+		args = append(args, "--log-warning=true")
+	}
+	if config.LogError {
+		args = append(args, "--log-error=true")
 	}
 
 	return &appsv1.Deployment{
@@ -54,11 +136,7 @@ func GetTritonDeployment(name, namespace, image string, replicas int32, labels s
 								},
 							},
 							Command: []string{"tritonserver"},
-							Args: []string{
-								"--model-repository=/model",
-								"--allow-gpu-metrics=false",
-								"--strict-model-config=false",
-							},
+							Args:    args,
 							Resources: corev1.ResourceRequirements{
 								Limits: corev1.ResourceList{
 									corev1.ResourceCPU:    resourceQuantity(cpu),
