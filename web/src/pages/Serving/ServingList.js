@@ -41,7 +41,7 @@ const ServingList = () => {
       toast.success('Triton deployment deleted successfully');
       fetchDeploys(pageInfo.page, pageInfo.limit);
     } catch (error) {
-      toast.error(error.message || 'Failed to delete Triton deployment');
+      toast.error(error.message || 'Failed to delete model service');
     }
   };
 
@@ -69,7 +69,7 @@ const ServingList = () => {
       color: 'red',
       onClick: handleDelete,
       confirm: {
-        content: 'Are you sure you want to delete this Triton deployment?',
+        content: 'Are you sure you want to delete this model deployment?',
         confirmButton: 'Delete',
         cancelButton: 'Cancel',
       }

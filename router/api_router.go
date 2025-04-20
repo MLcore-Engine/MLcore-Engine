@@ -124,6 +124,7 @@ func SetApiRouter(router *gin.Engine) {
 			tritonDeployRoute.PUT("/:id", controller.UpdateTritonDeploy)
 			// tritonDeployRoute.GET("/:id", controller.GetTritonDeploy)
 			tritonDeployRoute.GET("/get-all", controller.ListTritonDeploys)
+			tritonDeployRoute.GET("/config", controller.GetTritonConfig)
 		}
 
 	}
