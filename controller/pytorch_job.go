@@ -95,7 +95,7 @@ func CreateTrainingJob(c *gin.Context) {
 	c.JSON(http.StatusOK, TrainingJobResponse{
 		Success: true,
 		Message: "Training Job created successfully",
-		Data:    job,
+		Data:    convertToTrainingJobDTO(job),
 	})
 }
 
@@ -303,7 +303,7 @@ func GetTrainingJob(c *gin.Context) {
 	c.JSON(http.StatusOK, TrainingJobResponse{
 		Success: true,
 		Message: "",
-		Data:    *job,
+		Data:    convertToTrainingJobDTO(*job),
 	})
 }
 
@@ -359,35 +359,35 @@ func ListTrainingJobs(c *gin.Context) {
 		Success: true,
 		Message: "",
 		Data: TrainingJobsListData{
-			TrainingJobs: jobs,
-			Total:        total,
-			Page:         page,
-			Limit:        limit,
+			TrainingJobs: convertToTrainingJobDTOList(jobs),
+			PagedData: PagedData{
+				Total: total,
+				Page:  page,
+				Limit: limit,
+			},
 		},
 	})
 }
 
-// Define response structs
-type TrainingJobResponse struct {
-	Success bool              `json:"success" example:"true"`
-	Message string            `json:"message" example:"Training Job created successfully"`
-	Data    model.TrainingJob `json:"data"`
+// convertToTrainingJobDTO 将模型对象转换为DTO
+func convertToTrainingJobDTO(job model.TrainingJob) TrainingJobDTO {
+	return TrainingJobDTO{
+		ID:        job.ID,
+		Name:      job.Name,
+		Status:    job.Status,
+		ProjectID: job.ProjectID,
+		UserID:    job.UserID,
+		Image:     job.Image,
+		CreatedAt: job.CreatedAt,
+		UpdatedAt: job.UpdatedAt,
+	}
 }
 
-type TrainingJobsResponse struct {
-	Success bool                 `json:"success" example:"true"`
-	Message string               `json:"message" example:""`
-	Data    TrainingJobsListData `json:"data"`
-}
-
-type TrainingJobsListData struct {
-	TrainingJobs []model.TrainingJob `json:"training_jobs"`
-	Total        int64               `json:"total" example:"10"`
-	Page         int                 `json:"page" example:"1"`
-	Limit        int                 `json:"limit" example:"20"`
-}
-
-type SuccessResponse struct {
-	Success bool   `json:"success" example:"true"`
-	Message string `json:"message" example:"Operation successful"`
+// convertToTrainingJobDTOList 将模型对象列表转换为DTO列表
+func convertToTrainingJobDTOList(jobs []model.TrainingJob) []TrainingJobDTO {
+	dtos := make([]TrainingJobDTO, len(jobs))
+	for i, job := range jobs {
+		dtos[i] = convertToTrainingJobDTO(job)
+	}
+	return dtos
 }

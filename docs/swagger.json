@@ -9,6 +9,592 @@
     "host": "localhost:3000",
     "basePath": "/api",
     "paths": {
+        "/api/dataset": {
+            "get": {
+                "description": "获取当前用户有权限访问的数据集列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "获取数据集列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DatasetsResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建新的数据集",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "创建数据集",
+                "parameters": [
+                    {
+                        "description": "数据集信息",
+                        "name": "dataset",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Dataset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DatasetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dataset/project/{projectId}": {
+            "get": {
+                "description": "获取指定项目的所有数据集",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "获取项目数据集",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "项目ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DatasetsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dataset/search": {
+            "get": {
+                "description": "根据关键词搜索数据集",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "搜索数据集",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "搜索关键词",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DatasetsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dataset/{id}": {
+            "get": {
+                "description": "获取单个数据集的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "获取数据集详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "数据集ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DatasetResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "更新数据集的基本信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "更新数据集",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "数据集ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "数据集信息",
+                        "name": "dataset",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Dataset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DatasetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除指定的数据集",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "删除数据集",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "数据集ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dataset/{id}/entries": {
+            "get": {
+                "description": "获取指定数据集的条目列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "获取数据集条目列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "数据集ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "搜索关键词",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "搜索字段(instruction/input/output/all)",
+                        "name": "field",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DatasetEntriesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dataset/{id}/entry": {
+            "post": {
+                "description": "向数据集添加新的条目",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "创建数据集条目",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "数据集ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "条目内容",
+                        "name": "entry",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DatasetEntryResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dataset/{id}/entry/{entryId}": {
+            "get": {
+                "description": "获取指定数据集的单个条目",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "获取数据集条目",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "数据集ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "条目ID或索引",
+                        "name": "entryId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DatasetEntryResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "更新指定数据集的条目",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "更新数据集条目",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "数据集ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "条目ID或索引",
+                        "name": "entryId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "条目内容",
+                        "name": "entry",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DatasetEntryResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除指定数据集的条目",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "删除数据集条目",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "数据集ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "条目ID或索引",
+                        "name": "entryId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dataset/{id}/export": {
+            "get": {
+                "description": "将数据集导出为JSONL文件",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "导出数据集",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "数据集ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/dataset/{id}/import": {
+            "post": {
+                "description": "从JSONL文件导入数据到指定数据集",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dataset"
+                ],
+                "summary": "导入数据集",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "数据集ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "JSONL文件",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/triton/config": {
+            "get": {
+                "description": "Get all available Triton configuration options from config.yaml",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "triton"
+                ],
+                "summary": "Get Triton configuration from config file",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/notebook": {
             "post": {
                 "description": "Create a new Notebook with the provided details",
@@ -345,6 +931,70 @@
             }
         },
         "/project-memberships": {
+            "put": {
+                "description": "Update the role of a user in a specified project",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project-memberships"
+                ],
+                "summary": "Update a user's role in a project",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Role Update Info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.RoleUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Add a user to a project with a specified role",
                 "consumes": [
@@ -359,12 +1009,12 @@
                 "summary": "Add a user to a project",
                 "parameters": [
                     {
-                        "description": "User Project Info",
-                        "name": "userProject",
+                        "description": "Member Info",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controller.UserProjectRequest"
+                            "$ref": "#/definitions/controller.SuccessResponse"
                         }
                     }
                 ],
@@ -372,7 +1022,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controller.UserProjectResponse"
+                            "$ref": "#/definitions/controller.SuccessResponse"
                         }
                     },
                     "400": {
@@ -416,19 +1066,22 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controller.ProjectsResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.User"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controller.ErrorResponse"
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/controller.ErrorResponse"
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
                         }
                     }
                 }
@@ -460,89 +1113,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controller.ProjectsResponse"
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controller.ErrorResponse"
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/controller.ErrorResponse"
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
                         }
                     }
                 }
             }
         },
         "/project-memberships/{projectId}/{userId}": {
-            "put": {
-                "description": "Update the role of a user in a specified project",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "project-memberships"
-                ],
-                "summary": "Update a user's role in a project",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Project ID",
-                        "name": "projectId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Role Update Info",
-                        "name": "roleUpdate",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controller.RoleUpdateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controller.UpdateUserProjectRoleResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/controller.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/controller.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/controller.ErrorResponse"
-                        }
-                    }
-                }
-            },
             "delete": {
                 "description": "Remove a user from a specified project",
                 "consumes": [
@@ -575,25 +1164,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controller.SuccessResponse"
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controller.ErrorResponse"
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/controller.ErrorResponse"
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/controller.ErrorResponse"
+                            "$ref": "#/definitions/controller.ProjectMembershipResponse"
                         }
                     }
                 }
@@ -601,7 +1190,7 @@
         },
         "/project/get-all": {
             "get": {
-                "description": "Get a list of all projects",
+                "description": "Get a list of projects with pagination",
                 "consumes": [
                     "application/json"
                 ],
@@ -611,15 +1200,34 @@
                 "tags": [
                     "projects"
                 ],
-                "summary": "List all projects",
+                "summary": "List projects with pagination",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.Project"
-                            }
+                            "$ref": "#/definitions/controller.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
                         }
                     },
                     "500": {
@@ -773,15 +1381,651 @@
                     }
                 }
             }
+        },
+        "/pytorchtrain": {
+            "post": {
+                "description": "Create a new Training Job with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "training"
+                ],
+                "summary": "Create a new Training Job",
+                "parameters": [
+                    {
+                        "description": "Training Job details",
+                        "name": "training_job",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.TrainingJob"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.TrainingJobResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/pytorchtrain/{id}": {
+            "delete": {
+                "description": "Delete a Training Job by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "training"
+                ],
+                "summary": "Delete a Training Job",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Training Job ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/training/get-all": {
+            "get": {
+                "description": "Get a paginated list of Training Jobs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "training"
+                ],
+                "summary": "List Training Jobs",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.TrainingJobsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/training/{id}": {
+            "get": {
+                "description": "Get a Training Job by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "training"
+                ],
+                "summary": "Get a Training Job",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Training Job ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.TrainingJobResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/triton": {
+            "post": {
+                "description": "Create a new Triton Deployment with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "triton_deploy"
+                ],
+                "summary": "Create a new Triton Deployment",
+                "parameters": [
+                    {
+                        "description": "Triton Deployment details",
+                        "name": "triton_deploy",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.TritonDeploy"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/triton/get-all": {
+            "get": {
+                "description": "Get a paginated list of Triton Deployments",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "triton_deploy"
+                ],
+                "summary": "List Triton Deployments",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.TritonDeployResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/triton_deploy/{id}": {
+            "put": {
+                "description": "Update an existing Triton Deployment with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "triton_deploy"
+                ],
+                "summary": "Update a Triton Deployment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "TritonDeploy ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Triton Deployment details",
+                        "name": "triton_deploy",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.TritonDeploy"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an existing Triton Deployment by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "triton_deploy"
+                ],
+                "summary": "Delete a Triton Deployment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "TritonDeploy ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "controller.DatasetDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "数据集描述"
+                },
+                "entry_count": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "数据集名称"
+                },
+                "project_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "schema_definition": {
+                    "type": "string"
+                },
+                "storage_type": {
+                    "type": "string",
+                    "example": "database"
+                },
+                "template_type": {
+                    "type": "string",
+                    "example": "instruction_io"
+                },
+                "total_size": {
+                    "type": "integer",
+                    "example": 1024
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "controller.DatasetEntriesListData": {
+            "type": "object",
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controller.DatasetEntryDTO"
+                    }
+                },
+                "limit": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "page": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 100
+                }
+            }
+        },
+        "controller.DatasetEntriesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/controller.DatasetEntriesListData"
+                },
+                "message": {
+                    "type": "string",
+                    "example": ""
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "controller.DatasetEntryDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "dataset_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "entry_index": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "input": {
+                    "type": "string",
+                    "example": "输入内容"
+                },
+                "instruction": {
+                    "type": "string",
+                    "example": "指令内容"
+                },
+                "output": {
+                    "type": "string",
+                    "example": "输出内容"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.DatasetEntryResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/controller.DatasetEntryDTO"
+                },
+                "message": {
+                    "type": "string",
+                    "example": ""
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "controller.DatasetResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/controller.DatasetDTO"
+                },
+                "message": {
+                    "type": "string",
+                    "example": ""
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "controller.DatasetsListData": {
+            "type": "object",
+            "properties": {
+                "datasets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controller.DatasetDTO"
+                    }
+                },
+                "limit": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "page": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 100
+                }
+            }
+        },
+        "controller.DatasetsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/controller.DatasetsListData"
+                },
+                "message": {
+                    "type": "string",
+                    "example": ""
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
         "controller.ErrorResponse": {
             "type": "object",
             "properties": {
-                "error": {
+                "data": {},
+                "message": {
                     "type": "string",
-                    "example": "Invalid user ID"
+                    "example": "发生错误"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "controller.NotebookDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "image": {
+                    "type": "string",
+                    "example": "pytorch:latest"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "笔记本名称"
+                },
+                "project_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "type": "string",
+                    "example": "running"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -789,11 +2033,11 @@
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/model.Notebook"
+                    "$ref": "#/definitions/controller.NotebookDTO"
                 },
                 "message": {
                     "type": "string",
-                    "example": "Notebook created successfully"
+                    "example": ""
                 },
                 "success": {
                     "type": "boolean",
@@ -824,23 +2068,23 @@
         "controller.NotebooksListData": {
             "type": "object",
             "properties": {
+                "limit": {
+                    "type": "integer",
+                    "example": 10
+                },
                 "notebooks": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.Notebook"
+                        "$ref": "#/definitions/controller.NotebookDTO"
                     }
                 },
                 "page": {
                     "type": "integer",
                     "example": 1
                 },
-                "pageSize": {
-                    "type": "integer",
-                    "example": 20
-                },
                 "total": {
                     "type": "integer",
-                    "example": 10
+                    "example": 100
                 }
             }
         },
@@ -860,14 +2104,12 @@
                 }
             }
         },
-        "controller.ProjectsResponse": {
+        "controller.ProjectMembershipResponse": {
             "type": "object",
             "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.UserProject"
-                    }
+                "data": {},
+                "message": {
+                    "type": "string"
                 },
                 "success": {
                     "type": "boolean",
@@ -890,9 +2132,10 @@
         "controller.SuccessResponse": {
             "type": "object",
             "properties": {
+                "data": {},
                 "message": {
                     "type": "string",
-                    "example": "User successfully removed from project"
+                    "example": "操作成功"
                 },
                 "success": {
                     "type": "boolean",
@@ -900,29 +2143,50 @@
                 }
             }
         },
-        "controller.UpdateUserProjectRoleResponse": {
+        "controller.TrainingJobDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "image": {
+                    "type": "string",
+                    "example": "pytorch:latest"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "训练任务名称"
+                },
+                "project_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "type": "string",
+                    "example": "running"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "controller.TrainingJobResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "object",
-                    "properties": {
-                        "projectId": {
-                            "type": "integer",
-                            "example": 1
-                        },
-                        "role": {
-                            "type": "string",
-                            "example": "admin"
-                        },
-                        "userId": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
+                    "$ref": "#/definitions/controller.TrainingJobDTO"
                 },
                 "message": {
                     "type": "string",
-                    "example": "User role in project successfully updated"
+                    "example": "Training Job created successfully"
                 },
                 "success": {
                     "type": "boolean",
@@ -930,90 +2194,198 @@
                 }
             }
         },
-        "controller.UserProjectRequest": {
+        "controller.TrainingJobsListData": {
             "type": "object",
             "properties": {
-                "projectId": {
+                "limit": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "page": {
                     "type": "integer",
                     "example": 1
                 },
-                "role": {
+                "total": {
                     "type": "integer",
-                    "example": 1
+                    "example": 100
                 },
-                "userId": {
-                    "type": "integer",
-                    "example": 1
+                "training_jobs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controller.TrainingJobDTO"
+                    }
                 }
             }
         },
-        "controller.UserProjectResponse": {
+        "controller.TrainingJobsResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "object",
-                    "properties": {
-                        "projectId": {
-                            "type": "integer",
-                            "example": 1
-                        },
-                        "role": {
-                            "type": "string",
-                            "example": "admin"
-                        },
-                        "userId": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
+                    "$ref": "#/definitions/controller.TrainingJobsListData"
                 },
                 "message": {
                     "type": "string",
-                    "example": "User successfully added to project"
+                    "example": ""
                 },
                 "success": {
                     "type": "boolean",
                     "example": true
                 }
             }
+        },
+        "controller.TritonDeployDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "model_format": {
+                    "type": "string",
+                    "example": "onnx"
+                },
+                "model_path": {
+                    "type": "string",
+                    "example": "/models/resnet50"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "模型服务名称"
+                },
+                "project_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "type": "string",
+                    "example": "running"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "controller.TritonDeployResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/controller.TritonDeployDTO"
+                },
+                "message": {
+                    "type": "string",
+                    "example": ""
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "model.Dataset": {
+            "type": "object"
         },
         "model.Notebook": {
             "type": "object"
         },
         "model.Project": {
+            "type": "object"
+        },
+        "model.TrainingJob": {
             "type": "object",
             "properties": {
-                "createTime": {
+                "args": {
+                    "description": "JSON-encoded array of arguments",
                     "type": "string"
                 },
-                "description": {
+                "command": {
+                    "description": "JSON-encoded array of commands",
                     "type": "string"
+                },
+                "cpu_limit": {
+                    "description": "CPU limit per container",
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "env": {
+                    "description": "JSON-encoded environment variables",
+                    "type": "string"
+                },
+                "gpus_per_node": {
+                    "description": "Number of GPUs per node",
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
                 },
+                "image": {
+                    "type": "string"
+                },
+                "image_pull_policy": {
+                    "type": "string"
+                },
+                "master_replicas": {
+                    "description": "Number of master replicas",
+                    "type": "integer"
+                },
+                "memory_limit": {
+                    "description": "Memory limit per container",
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
-                "updateTime": {
+                "namespace": {
                     "type": "string"
+                },
+                "node_selector": {
+                    "description": "JSON-encoded node selector",
+                    "type": "string"
+                },
+                "parameters": {
+                    "description": "JSON string for parameters",
+                    "type": "string"
+                },
+                "project": {
+                    "$ref": "#/definitions/model.Project"
+                },
+                "project_id": {
+                    "type": "integer"
+                },
+                "restart_policy": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/model.User"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "worker_replicas": {
+                    "description": "Number of worker replicas",
+                    "type": "integer"
                 }
             }
         },
-        "model.UserProject": {
-            "type": "object",
-            "properties": {
-                "projectId": {
-                    "type": "integer"
-                },
-                "role": {
-                    "description": "root 1000, admin 100, common 1",
-                    "type": "integer"
-                },
-                "userId": {
-                    "type": "integer"
-                }
-            }
+        "model.TritonDeploy": {
+            "type": "object"
+        },
+        "model.User": {
+            "type": "object"
         }
     }
 }

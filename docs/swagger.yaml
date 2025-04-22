@@ -1,17 +1,183 @@
 basePath: /api
 definitions:
+  controller.DatasetDTO:
+    properties:
+      created_at:
+        type: string
+      description:
+        example: 数据集描述
+        type: string
+      entry_count:
+        example: 100
+        type: integer
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 数据集名称
+        type: string
+      project_id:
+        example: 1
+        type: integer
+      schema_definition:
+        type: string
+      storage_type:
+        example: database
+        type: string
+      template_type:
+        example: instruction_io
+        type: string
+      total_size:
+        example: 1024
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        example: 1
+        type: integer
+    type: object
+  controller.DatasetEntriesListData:
+    properties:
+      entries:
+        items:
+          $ref: '#/definitions/controller.DatasetEntryDTO'
+        type: array
+      limit:
+        example: 10
+        type: integer
+      page:
+        example: 1
+        type: integer
+      total:
+        example: 100
+        type: integer
+    type: object
+  controller.DatasetEntriesResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.DatasetEntriesListData'
+      message:
+        example: ""
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  controller.DatasetEntryDTO:
+    properties:
+      created_at:
+        type: string
+      dataset_id:
+        example: 1
+        type: integer
+      entry_index:
+        example: 0
+        type: integer
+      id:
+        example: 1
+        type: integer
+      input:
+        example: 输入内容
+        type: string
+      instruction:
+        example: 指令内容
+        type: string
+      output:
+        example: 输出内容
+        type: string
+      updated_at:
+        type: string
+    type: object
+  controller.DatasetEntryResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.DatasetEntryDTO'
+      message:
+        example: ""
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  controller.DatasetResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.DatasetDTO'
+      message:
+        example: ""
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  controller.DatasetsListData:
+    properties:
+      datasets:
+        items:
+          $ref: '#/definitions/controller.DatasetDTO'
+        type: array
+      limit:
+        example: 10
+        type: integer
+      page:
+        example: 1
+        type: integer
+      total:
+        example: 100
+        type: integer
+    type: object
+  controller.DatasetsResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.DatasetsListData'
+      message:
+        example: ""
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
   controller.ErrorResponse:
     properties:
-      error:
-        example: Invalid user ID
+      data: {}
+      message:
+        example: 发生错误
         type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  controller.NotebookDTO:
+    properties:
+      created_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      image:
+        example: pytorch:latest
+        type: string
+      name:
+        example: 笔记本名称
+        type: string
+      project_id:
+        example: 1
+        type: integer
+      status:
+        example: running
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        example: 1
+        type: integer
     type: object
   controller.NotebookResponse:
     properties:
       data:
-        $ref: '#/definitions/model.Notebook'
+        $ref: '#/definitions/controller.NotebookDTO'
       message:
-        example: Notebook created successfully
+        example: ""
         type: string
       success:
         example: true
@@ -32,18 +198,18 @@ definitions:
     type: object
   controller.NotebooksListData:
     properties:
+      limit:
+        example: 10
+        type: integer
       notebooks:
         items:
-          $ref: '#/definitions/model.Notebook'
+          $ref: '#/definitions/controller.NotebookDTO'
         type: array
       page:
         example: 1
         type: integer
-      pageSize:
-        example: 20
-        type: integer
       total:
-        example: 10
+        example: 100
         type: integer
     type: object
   controller.NotebooksResponse:
@@ -57,12 +223,11 @@ definitions:
         example: true
         type: boolean
     type: object
-  controller.ProjectsResponse:
+  controller.ProjectMembershipResponse:
     properties:
-      data:
-        items:
-          $ref: '#/definitions/model.UserProject'
-        type: array
+      data: {}
+      message:
+        type: string
       success:
         example: true
         type: boolean
@@ -77,91 +242,184 @@ definitions:
     type: object
   controller.SuccessResponse:
     properties:
+      data: {}
       message:
-        example: User successfully removed from project
+        example: 操作成功
         type: string
       success:
         example: true
         type: boolean
     type: object
-  controller.UpdateUserProjectRoleResponse:
+  controller.TrainingJobDTO:
+    properties:
+      created_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      image:
+        example: pytorch:latest
+        type: string
+      name:
+        example: 训练任务名称
+        type: string
+      project_id:
+        example: 1
+        type: integer
+      status:
+        example: running
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        example: 1
+        type: integer
+    type: object
+  controller.TrainingJobResponse:
     properties:
       data:
-        properties:
-          projectId:
-            example: 1
-            type: integer
-          role:
-            example: admin
-            type: string
-          userId:
-            example: 1
-            type: integer
-        type: object
+        $ref: '#/definitions/controller.TrainingJobDTO'
       message:
-        example: User role in project successfully updated
+        example: Training Job created successfully
         type: string
       success:
         example: true
         type: boolean
     type: object
-  controller.UserProjectRequest:
+  controller.TrainingJobsListData:
     properties:
-      projectId:
+      limit:
+        example: 10
+        type: integer
+      page:
         example: 1
         type: integer
-      role:
-        example: 1
+      total:
+        example: 100
         type: integer
-      userId:
-        example: 1
-        type: integer
+      training_jobs:
+        items:
+          $ref: '#/definitions/controller.TrainingJobDTO'
+        type: array
     type: object
-  controller.UserProjectResponse:
+  controller.TrainingJobsResponse:
     properties:
       data:
-        properties:
-          projectId:
-            example: 1
-            type: integer
-          role:
-            example: admin
-            type: string
-          userId:
-            example: 1
-            type: integer
-        type: object
+        $ref: '#/definitions/controller.TrainingJobsListData'
       message:
-        example: User successfully added to project
+        example: ""
         type: string
       success:
         example: true
         type: boolean
+    type: object
+  controller.TritonDeployDTO:
+    properties:
+      created_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      model_format:
+        example: onnx
+        type: string
+      model_path:
+        example: /models/resnet50
+        type: string
+      name:
+        example: 模型服务名称
+        type: string
+      project_id:
+        example: 1
+        type: integer
+      status:
+        example: running
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        example: 1
+        type: integer
+    type: object
+  controller.TritonDeployResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.TritonDeployDTO'
+      message:
+        example: ""
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  model.Dataset:
     type: object
   model.Notebook:
     type: object
   model.Project:
+    type: object
+  model.TrainingJob:
     properties:
-      createTime:
+      args:
+        description: JSON-encoded array of arguments
         type: string
-      description:
+      command:
+        description: JSON-encoded array of commands
         type: string
+      cpu_limit:
+        description: CPU limit per container
+        type: string
+      created_at:
+        type: string
+      env:
+        description: JSON-encoded environment variables
+        type: string
+      gpus_per_node:
+        description: Number of GPUs per node
+        type: integer
       id:
         type: integer
+      image:
+        type: string
+      image_pull_policy:
+        type: string
+      master_replicas:
+        description: Number of master replicas
+        type: integer
+      memory_limit:
+        description: Memory limit per container
+        type: string
       name:
         type: string
-      updateTime:
+      namespace:
         type: string
+      node_selector:
+        description: JSON-encoded node selector
+        type: string
+      parameters:
+        description: JSON string for parameters
+        type: string
+      project:
+        $ref: '#/definitions/model.Project'
+      project_id:
+        type: integer
+      restart_policy:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/model.User'
+      user_id:
+        type: integer
+      worker_replicas:
+        description: Number of worker replicas
+        type: integer
     type: object
-  model.UserProject:
-    properties:
-      projectId:
-        type: integer
-      role:
-        description: root 1000, admin 100, common 1
-        type: integer
-      userId:
-        type: integer
+  model.TritonDeploy:
+    type: object
+  model.User:
     type: object
 host: localhost:3000
 info:
@@ -170,6 +428,394 @@ info:
   title: MLcore-Engine API
   version: "1.0"
 paths:
+  /api/dataset:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前用户有权限访问的数据集列表
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.DatasetsResponse'
+      summary: 获取数据集列表
+      tags:
+      - Dataset
+    post:
+      consumes:
+      - application/json
+      description: 创建新的数据集
+      parameters:
+      - description: 数据集信息
+        in: body
+        name: dataset
+        required: true
+        schema:
+          $ref: '#/definitions/model.Dataset'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.DatasetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: 创建数据集
+      tags:
+      - Dataset
+  /api/dataset/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定的数据集
+      parameters:
+      - description: 数据集ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: 删除数据集
+      tags:
+      - Dataset
+    get:
+      consumes:
+      - application/json
+      description: 获取单个数据集的详细信息
+      parameters:
+      - description: 数据集ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.DatasetResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: 获取数据集详情
+      tags:
+      - Dataset
+    put:
+      consumes:
+      - application/json
+      description: 更新数据集的基本信息
+      parameters:
+      - description: 数据集ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 数据集信息
+        in: body
+        name: dataset
+        required: true
+        schema:
+          $ref: '#/definitions/model.Dataset'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.DatasetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: 更新数据集
+      tags:
+      - Dataset
+  /api/dataset/{id}/entries:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定数据集的条目列表
+      parameters:
+      - description: 数据集ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: limit
+        type: integer
+      - description: 搜索关键词
+        in: query
+        name: q
+        type: string
+      - description: 搜索字段(instruction/input/output/all)
+        in: query
+        name: field
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.DatasetEntriesResponse'
+      summary: 获取数据集条目列表
+      tags:
+      - Dataset
+  /api/dataset/{id}/entry:
+    post:
+      consumes:
+      - application/json
+      description: 向数据集添加新的条目
+      parameters:
+      - description: 数据集ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 条目内容
+        in: body
+        name: entry
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.DatasetEntryResponse'
+      summary: 创建数据集条目
+      tags:
+      - Dataset
+  /api/dataset/{id}/entry/{entryId}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定数据集的条目
+      parameters:
+      - description: 数据集ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 条目ID或索引
+        in: path
+        name: entryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+      summary: 删除数据集条目
+      tags:
+      - Dataset
+    get:
+      consumes:
+      - application/json
+      description: 获取指定数据集的单个条目
+      parameters:
+      - description: 数据集ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 条目ID或索引
+        in: path
+        name: entryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.DatasetEntryResponse'
+      summary: 获取数据集条目
+      tags:
+      - Dataset
+    put:
+      consumes:
+      - application/json
+      description: 更新指定数据集的条目
+      parameters:
+      - description: 数据集ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 条目ID或索引
+        in: path
+        name: entryId
+        required: true
+        type: integer
+      - description: 条目内容
+        in: body
+        name: entry
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.DatasetEntryResponse'
+      summary: 更新数据集条目
+      tags:
+      - Dataset
+  /api/dataset/{id}/export:
+    get:
+      description: 将数据集导出为JSONL文件
+      parameters:
+      - description: 数据集ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+      summary: 导出数据集
+      tags:
+      - Dataset
+  /api/dataset/{id}/import:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 从JSONL文件导入数据到指定数据集
+      parameters:
+      - description: 数据集ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: JSONL文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+      summary: 导入数据集
+      tags:
+      - Dataset
+  /api/dataset/project/{projectId}:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定项目的所有数据集
+      parameters:
+      - description: 项目ID
+        in: path
+        name: projectId
+        required: true
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.DatasetsResponse'
+      summary: 获取项目数据集
+      tags:
+      - Dataset
+  /api/dataset/search:
+    get:
+      consumes:
+      - application/json
+      description: 根据关键词搜索数据集
+      parameters:
+      - description: 搜索关键词
+        in: query
+        name: q
+        type: string
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.DatasetsResponse'
+      summary: 搜索数据集
+      tags:
+      - Dataset
+  /api/v1/triton/config:
+    get:
+      description: Get all available Triton configuration options from config.yaml
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Triton configuration from config file
+      tags:
+      - triton
   /notebook:
     post:
       consumes:
@@ -397,19 +1043,19 @@ paths:
       - application/json
       description: Add a user to a project with a specified role
       parameters:
-      - description: User Project Info
+      - description: Member Info
         in: body
-        name: userProject
+        name: request
         required: true
         schema:
-          $ref: '#/definitions/controller.UserProjectRequest'
+          $ref: '#/definitions/controller.SuccessResponse'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/controller.UserProjectResponse'
+            $ref: '#/definitions/controller.SuccessResponse'
         "400":
           description: Bad Request
           schema:
@@ -419,6 +1065,49 @@ paths:
           schema:
             $ref: '#/definitions/controller.ErrorResponse'
       summary: Add a user to a project
+      tags:
+      - project-memberships
+    put:
+      consumes:
+      - application/json
+      description: Update the role of a user in a specified project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: integer
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - description: Role Update Info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RoleUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
+      summary: Update a user's role in a project
       tags:
       - project-memberships
   /project-memberships/{projectId}/{userId}:
@@ -443,63 +1132,20 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/controller.SuccessResponse'
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controller.ErrorResponse'
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/controller.ErrorResponse'
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/controller.ErrorResponse'
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
       summary: Remove a user from a project
-      tags:
-      - project-memberships
-    put:
-      consumes:
-      - application/json
-      description: Update the role of a user in a specified project
-      parameters:
-      - description: Project ID
-        in: path
-        name: projectId
-        required: true
-        type: integer
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: integer
-      - description: Role Update Info
-        in: body
-        name: roleUpdate
-        required: true
-        schema:
-          $ref: '#/definitions/controller.RoleUpdateRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controller.UpdateUserProjectRoleResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/controller.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/controller.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/controller.ErrorResponse'
-      summary: Update a user's role in a project
       tags:
       - project-memberships
   /project-memberships/project/{projectId}:
@@ -519,15 +1165,17 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/controller.ProjectsResponse'
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controller.ErrorResponse'
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/controller.ErrorResponse'
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
       summary: Get members of a project
       tags:
       - project-memberships
@@ -548,15 +1196,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/controller.ProjectsResponse'
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controller.ErrorResponse'
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/controller.ErrorResponse'
+            $ref: '#/definitions/controller.ProjectMembershipResponse'
       summary: Get projects for a user
       tags:
       - project-memberships
@@ -659,21 +1307,299 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a list of all projects
+      description: Get a list of projects with pagination
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/model.Project'
-            type: array
+            $ref: '#/definitions/controller.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/controller.ErrorResponse'
-      summary: List all projects
+      summary: List projects with pagination
       tags:
       - projects
+  /pytorchtrain:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Training Job with the provided details
+      parameters:
+      - description: Training Job details
+        in: body
+        name: training_job
+        required: true
+        schema:
+          $ref: '#/definitions/model.TrainingJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.TrainingJobResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Create a new Training Job
+      tags:
+      - training
+  /pytorchtrain/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Training Job by its ID
+      parameters:
+      - description: Training Job ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Delete a Training Job
+      tags:
+      - training
+  /training/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a Training Job by its ID
+      parameters:
+      - description: Training Job ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.TrainingJobResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Get a Training Job
+      tags:
+      - training
+  /training/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of Training Jobs
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.TrainingJobsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: List Training Jobs
+      tags:
+      - training
+  /triton:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Triton Deployment with the provided details
+      parameters:
+      - description: Triton Deployment details
+        in: body
+        name: triton_deploy
+        required: true
+        schema:
+          $ref: '#/definitions/model.TritonDeploy'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Create a new Triton Deployment
+      tags:
+      - triton_deploy
+  /triton/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of Triton Deployments
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.TritonDeployResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: List Triton Deployments
+      tags:
+      - triton_deploy
+  /triton_deploy/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing Triton Deployment by ID
+      parameters:
+      - description: TritonDeploy ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Delete a Triton Deployment
+      tags:
+      - triton_deploy
+    put:
+      consumes:
+      - application/json
+      description: Update an existing Triton Deployment with the provided details
+      parameters:
+      - description: TritonDeploy ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Triton Deployment details
+        in: body
+        name: triton_deploy
+        required: true
+        schema:
+          $ref: '#/definitions/model.TritonDeploy'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Update a Triton Deployment
+      tags:
+      - triton_deploy
 swagger: "2.0"

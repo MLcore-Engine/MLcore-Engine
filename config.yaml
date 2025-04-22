@@ -83,3 +83,9 @@ crds:
     plural: pytorchjobs
     timeout: 172800
 
+# MinIO配置部分
+minio:
+  endpoint: "127.0.0.1:9000"  # MinIO服务器地址
+  accessKey: "minioadmin"     # 访问密钥
+  secretKey: "minioadmin"     # 密钥
+  useSSL: false               # 是否使用SSL连接
