@@ -1,8 +1,36 @@
 .ui.menu a.item:hover {
   cursor: pointer;
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(19, 62, 135, 0.05);
   color: #133e87;
 }
+
 .ui.menu .ui.dropdown .menu > .item:hover {
   color: #133e87 !important;
+  background: rgba(19, 62, 135, 0.05) !important;
+}
+
+.ui.menu {
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.ui.menu .item {
+  transition: all 0.2s ease;
+}
+
+.ui.menu .ui.dropdown .menu {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: none;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+}
+
+.ui.menu .ui.dropdown .menu > .item {
+  padding: 0.7rem 1.2rem !important;
+  font-weight: 500;
+}
+
+.ui.menu.fixed {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }

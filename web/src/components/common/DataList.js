@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Input, Button, Icon, Confirm, Header } from 'semantic-ui-react';
+import { Table, Input, Button, Icon, Confirm, Header, Segment } from 'semantic-ui-react';
 
 /**
  * 通用数据列表组件
@@ -137,11 +137,11 @@ const DataList = ({
         <Button
           key={index}
           icon
-          compact
+          className="action-button"
           color={action.color}
           onClick={() => handleActionClick(item, action)}
           aria-label={`${action.color}-action-button`}
-          size="small"
+          size="tiny"
         >
           <Icon name={action.icon} />
         </Button>
@@ -151,12 +151,24 @@ const DataList = ({
     return (
       <>
         {onEdit && (
-          <Button icon compact color="blue" onClick={() => onEdit(item)} size="small">
+          <Button 
+            icon 
+            className="action-button" 
+            color="blue" 
+            onClick={() => onEdit(item)} 
+            size="tiny"
+          >
             <Icon name="edit" />
           </Button>
         )}
         {onDelete && (
-          <Button icon compact color="red" onClick={() => handleDeleteClick(item)} size="small">
+          <Button 
+            icon 
+            className="action-button" 
+            color="red" 
+            onClick={() => handleDeleteClick(item)} 
+            size="tiny"
+          >
             <Icon name="trash" />
           </Button>
         )}
@@ -166,79 +178,133 @@ const DataList = ({
 
   // 主体渲染
   return (
-    <div className={className}>
-      <Header as="h3">{title}</Header>
+    <div className={`data-list-container ${className || ''}`}>
       <div className="datalist-header">
-        <Input 
-          icon="search" 
-          placeholder="搜索..." 
-          value={searchTerm} 
-          onChange={handleSearch}
-          size="small"
-        />
-        {onAdd && (
-          <Button primary size="small" onClick={onAdd}>
-            <Icon name="plus" /> 添加
-          </Button>
-        )}
+        <Header as="h2" className="title-text">{title}</Header>
+        <div className="datalist-actions">
+          <Input 
+            icon="search" 
+            placeholder="搜索..." 
+            value={searchTerm} 
+            onChange={handleSearch}
+            size="small"
+            className="search-input"
+          />
+          {onAdd && (
+            <Button 
+              primary 
+              size="small" 
+              onClick={onAdd}
+              className="add-button"
+            >
+              <Icon name="plus" /> 添加
+            </Button>
+          )}
+        </div>
       </div>
       
-      <Table compact celled striped>
-        <Table.Header>
-          <Table.Row>
-            {columns.map((column) => (
-              <Table.HeaderCell key={column}>
-                {columnNames[column] || column}
-              </Table.HeaderCell>
-            ))}
-            <Table.HeaderCell width={2}>操作</Table.HeaderCell> 
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {filteredData.length > 0 ? (
-            filteredData.map((item) => {
-              const rowData = renderRow ? renderRow(item) : item;
-              const rowKey = item.ID || item.id || `row-${Math.random()}`;
-              
-              return (
-                <Table.Row key={rowKey}>
-                  {columns.map((column) => (
-                    <Table.Cell key={`${rowKey}-${column}`}>
-                      {rowData[column]}
-                    </Table.Cell>
-                  ))}
-                  <Table.Cell textAlign="center">
-                    <div className="action-buttons">
-                      {renderActionButtons(item)}
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
-              );
-            })
-          ) : (
+      <div className="table-container">
+        <Table celled selectable>
+          <Table.Header>
             <Table.Row>
-              <Table.Cell colSpan={columns.length + 1} textAlign="center">
-                暂无数据
-              </Table.Cell>
+              {columns.map((column) => (
+                <Table.HeaderCell key={column}>
+                  {columnNames[column] || column}
+                </Table.HeaderCell>
+              ))}
+              <Table.HeaderCell width={2} textAlign="center">操作</Table.HeaderCell> 
             </Table.Row>
-          )}
-        </Table.Body>
-      </Table>
+          </Table.Header>
+          <Table.Body>
+            {filteredData.length > 0 ? (
+              filteredData.map((item) => {
+                const rowData = renderRow ? renderRow(item) : item;
+                const rowKey = item.ID || item.id || `row-${Math.random()}`;
+                
+                return (
+                  <Table.Row key={rowKey} className="data-row">
+                    {columns.map((column) => (
+                      <Table.Cell key={`${rowKey}-${column}`}>
+                        {rowData[column]}
+                      </Table.Cell>
+                    ))}
+                    <Table.Cell textAlign="center">
+                      <div className="action-buttons">
+                        {renderActionButtons(item)}
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })
+            ) : (
+              <Table.Row>
+                <Table.Cell colSpan={columns.length + 1} textAlign="center">
+                  <div className="empty-state">
+                    <Icon name="database" size="large" />
+                    <div>暂无数据</div>
+                  </div>
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table>
+      </div>
 
       {renderConfirm()}
 
       <style jsx>{`
+        .data-list-container {
+          background-color: white;
+          border-radius: 0.75rem;
+          padding: 1.5rem;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
         .datalist-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          margin-bottom: 1.5rem;
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+        .title-text {
+          margin: 0 !important;
+          color: #333 !important;
+          font-weight: 600 !important;
+        }
+        .datalist-actions {
+          display: flex;
+          gap: 0.75rem;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+        .search-input {
+          min-width: 240px;
+        }
+        .add-button {
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+          padding: 0.6rem 1rem !important;
+        }
+        .table-container {
+          border-radius: 0.5rem;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
           margin-bottom: 1rem;
         }
-        
         .action-buttons {
           display: flex;
           gap: 0.5rem;
           justify-content: center;
+        }
+        .empty-state {
+          padding: 2rem 0;
+          color: #888;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;
         }
       `}</style>
     </div>
