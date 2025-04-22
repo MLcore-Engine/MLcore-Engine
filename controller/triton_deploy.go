@@ -444,14 +444,16 @@ func ListTritonDeploys(c *gin.Context) {
 		// deploys[i].ParsedPorts = ports
 	}
 
-	c.JSON(http.StatusOK, TritonDeployResponse{
-		Success: true,
-		Message: "",
-		Data: TritonDeployListData{
-			Deployments: deploys,
-			Total:       total,
-			Page:        page,
-			Limit:       limit,
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data": TritonDeployListData{
+			Deploys: convertToTritonDeployDTOList(deploys),
+			PagedData: PagedData{
+				Total: total,
+				Page:  page,
+				Limit: limit,
+			},
 		},
 	})
 }
@@ -504,16 +506,26 @@ func getNodePorts(service *corev1.Service) []int32 {
 	return ports
 }
 
-// Response structs
-type TritonDeployResponse struct {
-	Success bool                 `json:"success" example:"true"`
-	Message string               `json:"message" example:""`
-	Data    TritonDeployListData `json:"data"`
+// convertToTritonDeployDTO 将模型对象转换为DTO
+func convertToTritonDeployDTO(deploy model.TritonDeploy) TritonDeployDTO {
+	return TritonDeployDTO{
+		ID:          deploy.ID,
+		Name:        deploy.Name,
+		Status:      deploy.Status,
+		ProjectID:   deploy.ProjectID,
+		UserID:      deploy.UserID,
+		ModelPath:   deploy.ModelRepository,
+		ModelFormat: "",
+		CreatedAt:   deploy.CreatedAt,
+		UpdatedAt:   deploy.UpdatedAt,
+	}
 }
 
-type TritonDeployListData struct {
-	Deployments []model.TritonDeploy `json:"deployments"`
-	Total       int64                `json:"total" example:"10"`
-	Page        int                  `json:"page" example:"1"`
-	Limit       int                  `json:"limit" example:"20"`
+// convertToTritonDeployDTOList 将模型对象列表转换为DTO列表
+func convertToTritonDeployDTOList(deploys []model.TritonDeploy) []TritonDeployDTO {
+	dtos := make([]TritonDeployDTO, len(deploys))
+	for i, deploy := range deploys {
+		dtos[i] = convertToTritonDeployDTO(deploy)
+	}
+	return dtos
 }

@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import { Table, Input, Button, Icon, Confirm } from 'semantic-ui-react';
+import { Table, Input, Button, Icon, Confirm, Header } from 'semantic-ui-react';
 
+/**
+ * 通用数据列表组件
+ * 用于展示结构化数据，支持搜索、添加、编辑、删除等操作
+ */
 const DataList = ({
   title,
   data,
@@ -11,8 +15,9 @@ const DataList = ({
   onDelete,
   customActions,
   renderRow,
+  className,
 }) => {
-  
+  // 状态管理
   const [searchTerm, setSearchTerm] = useState('');
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [deleteItem, setDeleteItem] = useState(null);
@@ -20,13 +25,17 @@ const DataList = ({
   const [confirmContent, setConfirmContent] = useState('');
   const [confirmButtons, setConfirmButtons] = useState({});
 
+  // 数据安全处理
+  const safeData = Array.isArray(data) ? data : [];
+
+  // 事件处理
   const handleActionClick = (item, action) => {
     if (action.confirm) {
       setConfirmAction(() => () => action.onClick(item));
-      setConfirmContent(action.confirm.content || 'are you sure？');
+      setConfirmContent(action.confirm.content || '确认此操作?');
       setConfirmButtons({
-        confirmButton: action.confirm.confirmButton || 'yes',
-        cancelButton: action.confirm.cancelButton || 'no',
+        confirmButton: action.confirm.confirmButton || '确认',
+        cancelButton: action.confirm.cancelButton || '取消',
       });
       setIsConfirmOpen(true);
     } else {
@@ -39,13 +48,14 @@ const DataList = ({
       confirmAction();
       setConfirmAction(null);
     }
-    setIsConfirmOpen(false);
-    setConfirmContent('');
-    setConfirmButtons({});
+    closeConfirm();
   };
 
-  // 取消操作
   const handleCancel = () => {
+    closeConfirm();
+  };
+
+  const closeConfirm = () => {
     setIsConfirmOpen(false);
     setConfirmAction(null);
     setConfirmContent('');
@@ -60,43 +70,6 @@ const DataList = ({
     }
   };
 
-
-  const renderConfirm = () => {
-    
-    // if custom action confirm
-    if (confirmAction) {
-      return (
-        <Confirm
-          open={isConfirmOpen}
-          content={confirmContent}
-          onCancel={handleCancel}
-          onConfirm={handleConfirm}
-          cancelButton={confirmButtons.cancelButton || '取消'}
-          confirmButton={confirmButtons.confirmButton || '确定'}
-          size="mini"
-          dimmer="inverted"
-        />
-      );
-    }
-
-    // if delete confirm
-    if (deleteItem) {
-      return (
-        <Confirm
-          open={isConfirmOpen}
-          content="are you sure？"
-          onCancel={() => setIsConfirmOpen(false)}
-          onConfirm={handleConfirmDelete}
-          cancelButton="no"
-          confirmButton="yes"
-          size="mini"
-        />
-      );
-    }
-
-    return null;
-  };
-
   const handleDeleteClick = (item) => {
     setDeleteItem(item);
     setIsConfirmOpen(true);
@@ -104,35 +77,113 @@ const DataList = ({
 
   const handleSearch = (e, { value }) => setSearchTerm(value);
 
+  // 安全的数据过滤处理
   const safeFilter = (item) => {
     try {
+      if (!item || typeof item !== 'object') return false;
+      
       return columns.some((column) => {
         const value = item[column];
         if (value == null) return false;
         return value.toString().toLowerCase().includes(searchTerm.toLowerCase());
       });
     } catch (error) {
-      console.error('search error :', error);
+      console.error('搜索错误:', error);
       return false;
     }
   };
 
+  const filteredData = safeData.filter(safeFilter);
 
+  // 渲染确认对话框
+  const renderConfirm = () => {
+    if (confirmAction) {
+      return (
+        <Confirm
+          open={isConfirmOpen}
+          content={confirmContent}
+          onCancel={handleCancel}
+          onConfirm={handleConfirm}
+          cancelButton={confirmButtons.cancelButton}
+          confirmButton={confirmButtons.confirmButton}
+          size="mini"
+          dimmer="inverted"
+        />
+      );
+    }
 
-  const filteredData = data.filter(safeFilter);
+    if (deleteItem) {
+      return (
+        <Confirm
+          open={isConfirmOpen}
+          content="确定要删除此项吗?"
+          onCancel={() => setIsConfirmOpen(false)}
+          onConfirm={handleConfirmDelete}
+          cancelButton="取消"
+          confirmButton="确认"
+          size="mini"
+          dimmer="inverted"
+        />
+      );
+    }
 
+    return null;
+  };
+
+  // 自定义操作按钮和基础操作按钮渲染
+  const renderActionButtons = (item) => {
+    if (customActions && customActions.length > 0) {
+      return customActions.map((action, index) => (
+        <Button
+          key={index}
+          icon
+          compact
+          color={action.color}
+          onClick={() => handleActionClick(item, action)}
+          aria-label={`${action.color}-action-button`}
+          size="small"
+        >
+          <Icon name={action.icon} />
+        </Button>
+      ));
+    }
+
+    return (
+      <>
+        {onEdit && (
+          <Button icon compact color="blue" onClick={() => onEdit(item)} size="small">
+            <Icon name="edit" />
+          </Button>
+        )}
+        {onDelete && (
+          <Button icon compact color="red" onClick={() => handleDeleteClick(item)} size="small">
+            <Icon name="trash" />
+          </Button>
+        )}
+      </>
+    );
+  };
+
+  // 主体渲染
   return (
-    <div>
-      <h3>{title}</h3>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1em' }}>
-        <Input icon="search" placeholder="searching..." value={searchTerm} onChange={handleSearch} />
+    <div className={className}>
+      <Header as="h3">{title}</Header>
+      <div className="datalist-header">
+        <Input 
+          icon="search" 
+          placeholder="搜索..." 
+          value={searchTerm} 
+          onChange={handleSearch}
+          size="small"
+        />
         {onAdd && (
-          <Button primary onClick={onAdd}>
-            <Icon name="plus" /> Add
+          <Button primary size="small" onClick={onAdd}>
+            <Icon name="plus" /> 添加
           </Button>
         )}
       </div>
-      <Table celled striped>
+      
+      <Table compact celled striped>
         <Table.Header>
           <Table.Row>
             {columns.map((column) => (
@@ -140,46 +191,26 @@ const DataList = ({
                 {columnNames[column] || column}
               </Table.HeaderCell>
             ))}
-            <Table.HeaderCell>Action</Table.HeaderCell> 
+            <Table.HeaderCell width={2}>操作</Table.HeaderCell> 
           </Table.Row>
         </Table.Header>
         <Table.Body>
           {filteredData.length > 0 ? (
             filteredData.map((item) => {
               const rowData = renderRow ? renderRow(item) : item;
+              const rowKey = item.ID || item.id || `row-${Math.random()}`;
+              
               return (
-                <Table.Row key={item.ID}>
+                <Table.Row key={rowKey}>
                   {columns.map((column) => (
-                    <Table.Cell key={`${item.ID}-${column}`}>
+                    <Table.Cell key={`${rowKey}-${column}`}>
                       {rowData[column]}
                     </Table.Cell>
                   ))}
-                  <Table.Cell>
-                    {customActions && customActions.length > 0
-                      ? customActions.map((action, index) => (
-                          <Button
-                            key={index}
-                            icon
-                            color={action.color}
-                            onClick={() => handleActionClick(item, action)}
-                            aria-label={`${action.color}-action-button`}
-                            >
-                            <Icon name={action.icon} />
-                          </Button>
-                        ))
-                      : <>
-                          {onEdit && (
-                            <Button icon color="blue" onClick={() => onEdit(item)}>
-                              <Icon name="edit" />
-                            </Button>
-                          )}
-                          {onDelete && (
-                            <Button icon color="red" onClick={() => handleDeleteClick(item)}>
-                              <Icon name="trash" />
-                            </Button>
-                          )}
-                        </>
-                    }
+                  <Table.Cell textAlign="center">
+                    <div className="action-buttons">
+                      {renderActionButtons(item)}
+                    </div>
                   </Table.Cell>
                 </Table.Row>
               );
@@ -187,7 +218,7 @@ const DataList = ({
           ) : (
             <Table.Row>
               <Table.Cell colSpan={columns.length + 1} textAlign="center">
-                No data
+                暂无数据
               </Table.Cell>
             </Table.Row>
           )}
@@ -195,6 +226,21 @@ const DataList = ({
       </Table>
 
       {renderConfirm()}
+
+      <style jsx>{`
+        .datalist-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+        }
+        
+        .action-buttons {
+          display: flex;
+          gap: 0.5rem;
+          justify-content: center;
+        }
+      `}</style>
     </div>
   );
 };

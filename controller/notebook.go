@@ -663,29 +663,3 @@ func deleteNotebookResources(k8sClient *services.K8s, notebook *model.Notebook) 
 
 	return nil
 }
-
-// Swagger model definitions
-type NotebookResponse struct {
-	Success bool           `json:"success" example:"true"`
-	Message string         `json:"message" example:"Notebook created successfully"`
-	Data    model.Notebook `json:"data"`
-}
-
-type NotebooksResponse struct {
-	Success bool              `json:"success" example:"true"`
-	Message string            `json:"message" example:""`
-	Data    NotebooksListData `json:"data"`
-}
-
-type NotebooksListData struct {
-	Notebooks []model.Notebook `json:"notebooks"`
-	Total     int64            `json:"total" example:"10"`
-	Page      int              `json:"page" example:"1"`
-	PageSize  int              `json:"pageSize" example:"20"`
-}
-
-type ErrorResponse struct {
-	Success bool        `json:"success" example:"false"`
-	Message string      `json:"message" example:"An error occurred"`
-	Data    interface{} `json:"data,omitempty"`
-}

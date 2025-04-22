@@ -14,12 +14,12 @@ console.log(react.version)
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-    <ProjectProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <ProjectProvider>
         <BrowserRouter>
           <App />   
           <ToastContainer />
         </BrowserRouter>
-      </AuthProvider>   
-  </ProjectProvider>
+      </ProjectProvider>
+    </AuthProvider>
 );

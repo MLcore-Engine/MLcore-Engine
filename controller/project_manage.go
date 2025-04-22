@@ -91,9 +91,9 @@ func GetProjectMembers(c *gin.Context) {
 // @Tags project-memberships
 // @Accept json
 // @Produce json
-// @Param request body AddMemberRequest true "Member Info"
-// @Success 200 {object} ProjectMembershipResponse
-// @Failure 400,500 {object} ProjectMembershipResponse
+// @Param request body SuccessResponse true "Member Info"
+// @Success 200 {object} SuccessResponse
+// @Failure 400,500 {object} ErrorResponse
 // @Router /project-memberships [post]
 func AddUserToProject(c *gin.Context) {
 
@@ -104,9 +104,9 @@ func AddUserToProject(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": err.Error(),
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Success: false,
+			Message: err.Error(),
 		})
 		return
 	}
@@ -118,25 +118,25 @@ func AddUserToProject(c *gin.Context) {
 	}
 
 	if err := userProject.ValidateRole(); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": err.Error(),
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Success: false,
+			Message: err.Error(),
 		})
 		return
 	}
 
 	if err := model.DB.Create(&userProject).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": err.Error(),
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Success: false,
+			Message: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "User successfully added to project",
-		"data":    userProject,
+	c.JSON(http.StatusOK, SuccessResponse{
+		Success: true,
+		Message: "User successfully added to project",
+		Data:    userProject,
 	})
 }
 

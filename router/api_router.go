@@ -127,5 +127,29 @@ func SetApiRouter(router *gin.Engine) {
 			tritonDeployRoute.GET("/config", controller.GetTritonConfig)
 		}
 
+		// router/api_router.go 中添加
+		datasetRoute := apiRouter.Group("/dataset")
+		datasetRoute.Use(middleware.UserAuth())
+		{
+			datasetRoute.POST("/", controller.CreateDataset)
+			datasetRoute.GET("/", controller.ListDatasets)
+			datasetRoute.GET("/:id", controller.GetDataset)
+			datasetRoute.PUT("/:id", controller.UpdateDataset)
+			datasetRoute.DELETE("/:id", controller.DeleteDataset)
+			datasetRoute.GET("/search", controller.SearchDatasets)
+			datasetRoute.GET("/project/:projectId", controller.GetProjectDatasets)
+
+			// 数据条目相关路由
+			datasetRoute.GET("/:id/entries", controller.GetDatasetEntries)
+			datasetRoute.GET("/:id/entry/:entryId", controller.GetDatasetEntry)
+			datasetRoute.POST("/:id/entry", controller.CreateDatasetEntry)
+			datasetRoute.PUT("/:id/entry/:entryId", controller.UpdateDatasetEntry)
+			datasetRoute.DELETE("/:id/entry/:entryId", controller.DeleteDatasetEntry)
+
+			// 导入导出相关路由
+			datasetRoute.POST("/:id/import", middleware.UploadRateLimit(), controller.ImportDataset)
+			datasetRoute.GET("/:id/export", controller.ExportDataset)
+		}
+
 	}
 }

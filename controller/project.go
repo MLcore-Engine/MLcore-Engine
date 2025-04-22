@@ -136,7 +136,7 @@ func GetProject(c *gin.Context) {
 // @Produce json
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Number of items per page" default(10)
-// @Success 200 {object} PaginatedResponse
+// @Success 200 {object} SuccessResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /project/get-all [get]
@@ -162,13 +162,17 @@ func ListProjects(c *gin.Context) {
 	})
 
 	if err := query.Offset(offset).Limit(limit).Find(&projects).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to retrieve projects"})
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Success: false,
+			Message: "Failed to retrieve projects",
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"data": gin.H{
+	c.JSON(http.StatusOK, SuccessResponse{
+		Success: true,
+		Message: "Projects retrieved successfully",
+		Data: gin.H{
 			"projects": projects,
 			"total":    total,
 			"page":     page,

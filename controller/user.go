@@ -18,11 +18,6 @@ username := c.GetString("username")
 role := c.GetInt("role")
 */
 
-type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 func Login(c *gin.Context) {
 	if !common.PasswordLoginEnabled {
 		c.JSON(http.StatusOK, gin.H{

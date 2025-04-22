@@ -87,6 +87,18 @@ func InitDB() (err error) {
 			return err
 		}
 
+		if err := db.AutoMigrate(&Dataset{}); err != nil {
+			return err
+		}
+
+		if err := db.AutoMigrate(&DatasetVersion{}); err != nil {
+			return err
+		}
+
+		if err := db.AutoMigrate(&DatasetEntry{}); err != nil {
+			return err
+		}
+
 		err = createRootAccountIfNeed()
 		return err
 	} else {
