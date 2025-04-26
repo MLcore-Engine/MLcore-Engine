@@ -9,6 +9,7 @@ import (
 
 func SetApiRouter(router *gin.Engine) {
 	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.Use(middleware.URLNormalizer())
 	apiRouter := router.Group("/api")
 	apiRouter.Use(middleware.GlobalAPIRateLimit())
 	{
@@ -40,13 +41,12 @@ func SetApiRouter(router *gin.Engine) {
 			userManageRoute := userRoute.Group("/manage")
 			userManageRoute.Use(middleware.AdminAuth())
 			{
-				userManageRoute.GET("/", controller.GetAllUsers)
-				userManageRoute.GET("/search", controller.SearchUsers)
-				userManageRoute.GET("/:id", controller.GetUser)
-				userManageRoute.POST("/", controller.CreateUser)
-				userManageRoute.POST("/manage", controller.ManageUser)
-				userManageRoute.PUT("/", controller.UpdateUser)
-				userManageRoute.DELETE("/:id", controller.DeleteUser)
+				userManageRoute.GET("/", controller.ListUsers)                  // 获取所有用户
+				userManageRoute.GET("/:id", controller.GetUser)                 // 获取单个用户
+				userManageRoute.POST("/", controller.CreateUser)                // 创建用户
+				userManageRoute.PUT("/:id", controller.UpdateUser)              // 更新用户
+				userManageRoute.DELETE("/:id", controller.DeleteUser)           // 删除用户
+				userManageRoute.PUT("/:id/status", controller.UpdateUserStatus) // 更新用户状态
 			}
 
 			adminRoute := userRoute.Group("/")
@@ -86,14 +86,14 @@ func SetApiRouter(router *gin.Engine) {
 			projectRoute.GET("/get-all", controller.ListProjects)
 		}
 
-		projectMembershipsRoute := apiRouter.Group("/project-memberships")
-		projectMembershipsRoute.Use(middleware.UserAuth())
+		projectMembersRoute := apiRouter.Group("/project-members")
+		projectMembersRoute.Use(middleware.UserAuth())
 		{
-			projectMembershipsRoute.GET("/user/:userId", controller.GetUserProjects)
-			projectMembershipsRoute.POST("/", controller.AddUserToProject)
-			projectMembershipsRoute.DELETE("/:projectID/:userID", controller.RemoveUserFromProject)
-			projectMembershipsRoute.PUT("/", controller.UpdateUserProjectRole)
-			projectMembershipsRoute.GET("/project/:projectId", controller.GetProjectMembers)
+			projectMembersRoute.GET("/user/:userId", controller.GetUserProjects)
+			projectMembersRoute.POST("/", controller.AddUserToProject)
+			projectMembersRoute.DELETE("/:projectId/:userId", controller.RemoveUserFromProject)
+			projectMembersRoute.PUT("/", controller.UpdateUserProjectRole)
+			projectMembersRoute.GET("/project/:projectId", controller.GetProjectMembers)
 		}
 
 		notebookRoute := apiRouter.Group("/notebook")

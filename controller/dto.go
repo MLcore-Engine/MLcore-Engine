@@ -81,24 +81,24 @@ type UsersListData struct {
 
 // 项目成员请求
 type ProjectMemberRequest struct {
-	ProjectID uint `json:"projectID" binding:"required" example:"1"`
-	UserID    uint `json:"userID" binding:"required" example:"2"`
+	ProjectId uint `json:"projectId" binding:"required" example:"1"`
+	UserId    uint `json:"userId" binding:"required" example:"2"`
 	Role      int  `json:"role" binding:"required" example:"1"`
 }
 
 // 项目成员DTO
 type MemberDTO struct {
-	ProjectID uint   `json:"projectId" example:"1"`
-	UserID    uint   `json:"userId" example:"2"`
+	ProjectId uint   `json:"projectId" example:"1"`
+	UserId    uint   `json:"userId" example:"2"`
 	Username  string `json:"username" example:"user123"`
 	Role      int    `json:"role" example:"1"`
 }
 
 // 项目成员关系DTO
 type ProjectMembershipDTO struct {
-	ID        uint    `json:"id" example:"1"`
-	UserID    uint    `json:"userId" example:"2"`
-	ProjectID uint    `json:"projectId" example:"1"`
+	Id        uint    `json:"id" example:"1"`
+	UserId    uint    `json:"userId" example:"2"`
+	ProjectId uint    `json:"projectId" example:"1"`
 	Role      int     `json:"role" example:"1"`
 	User      UserDTO `json:"user"`
 }
@@ -326,4 +326,11 @@ type WechatLoginResponse struct {
 	Success bool        `json:"success" example:"true"`
 	Message string      `json:"message,omitempty"`
 	Data    interface{} `json:"data,omitempty"`
+}
+
+// ========================= 通用操作结果 =========================
+
+// 删除操作结果
+type DeleteOperationResult struct {
+	ID uint `json:"id" example:"1"`
 }

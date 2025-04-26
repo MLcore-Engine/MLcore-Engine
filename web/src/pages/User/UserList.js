@@ -1,129 +1,213 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Dimmer, Loader } from 'semantic-ui-react';
-import { userAPI } from '../../api/userAPI';
+import React, { useState, useEffect } from 'react';
+import { Button, Modal, Form, Message, Input } from 'semantic-ui-react';
+import { useUsers } from '../../context/UserContext';
 import { toast } from 'react-toastify';
-import DataList from '../../components/common/DataList';
+import UserTable from '../../components/common/UserTable';
+import RoleSelector from '../../components/common/RoleSelector';
+import { ROLE } from '../../utils/roleUtils';
 
 const UserList = () => {
+    const {
+        users,
+        loading,
+        fetchUsers,
+        addUser,
+        deleteUser,
+        toggleUserStatus
+    } = useUsers();
+
     // 状态管理
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-    const [totalItems, setTotalItems] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newUserData, setNewUserData] = useState({
+        username: '',
+        display_name: '',
+        email: '',
+        password: '',
+        role: ROLE.COMMON,
+        status: 1
+    });
+    const [modalError, setModalError] = useState('');
+    const [userToDelete, setUserToDelete] = useState(null);
 
-    // 获取用户列表数据
-    const fetchUsers = useCallback(async (page = currentPage) => {
-        setLoading(true);
-        try {
-            const response = await userAPI.getUsers(page, pageSize);
-            if (response.success) {
-                setUsers(response.data);
-                setTotalItems(response.total);
-                setCurrentPage(response.page);
-                setPageSize(response.limit);
-            } else {
-                toast.error(response.message || '获取用户列表失败');
-            }
-        } catch (error) {
-            console.error('获取用户列表错误:', error);
-            toast.error(error.message || '获取用户列表失败');
-        } finally {
-            setLoading(false);
-        }
-    }, [currentPage, pageSize]);
-
-    // 首次加载和页码变化时获取数据
+    // 首次加载时获取用户列表
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
 
+    // 打开添加用户模态框
+    const handleAddUser = () => {
+        setIsModalOpen(true);
+        setModalError('');
+        setNewUserData({
+            username: '',
+            display_name: '',
+            email: '',
+            password: '',
+            role: ROLE.COMMON,
+            status: 1
+        });
+    };
+
+    // 关闭模态框
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setModalError('');
+    };
+
+    // 处理表单字段变化
+    const handleInputChange = (e, { name, value }) => {
+        setNewUserData(prev => ({ ...prev, [name]: value }));
+    };
+
+    // 提交新用户表单
+    const handleSubmitNewUser = async () => {
+        // 表单验证
+        if (!newUserData.username || !newUserData.password || !newUserData.email) {
+            setModalError('用户名、密码和邮箱为必填项');
+            return;
+        }
+
+        try {
+            await addUser(newUserData);
+            handleModalClose();
+            toast.success('用户添加成功');
+        } catch (err) {
+            setModalError(err.message || '添加用户失败');
+        }
+    };
+
+    // 处理删除用户点击
+    const handleDeleteClick = (user) => {
+        setUserToDelete(user);
+        // 这里应该显示确认对话框，简化起见直接调用删除
+        handleConfirmDelete(user);
+    };
+
+    // 执行删除用户
+    const handleConfirmDelete = async (user) => {
+        if (user) {
+            try {
+                await deleteUser(user.id);
+                toast.success('用户已删除');
+            } catch (err) {
+                toast.error(err.message || '删除用户失败');
+            }
+        }
+    };
+
+    // 处理状态切换
+    const handleToggleStatus = async (user) => {
+        try {
+            const action = user.status === 1 ? 'disable' : 'enable';
+            await toggleUserStatus(user.id, action);
+            toast.success(`用户已${user.status === 1 ? '禁用' : '启用'}`);
+        } catch (err) {
+            toast.error(err.message || `${user.status === 1 ? '禁用' : '启用'}用户失败`);
+        }
+    };
+
     // 表格列配置
-    const columns = ['username', 'email', 'role', 'status'];
+    const columns = ['username', 'display_name', 'email', 'role', 'status'];
     const columnNames = {
         username: '用户名',
+        display_name: '显示名称',
         email: '邮箱',
         role: '角色',
         status: '状态'
     };
 
-    // 行数据转换
-    const renderRow = (user) => ({
-        ...user,
-        role: getRoleName(user.role),
-        status: user.status === 1 ? '启用' : '禁用'
-    });
-
-    // 角色名称转换
-    const getRoleName = (role) => {
-        switch (role) {
-            case 1:
-                return '普通用户';
-            case 10:
-                return '管理员';
-            case 100:
-                return '超级管理员';
-            default:
-                return '未知';
-        }
-    };
-
     // 自定义操作按钮
     const customActions = [
         {
-            icon: 'lock',
+            icon: 'power',
             color: 'orange',
-            onClick: handleToggleStatus
-        },
-        {
-            icon: 'edit',
-            color: 'blue',
-            onClick: handleEdit
+            onClick: handleToggleStatus,
+            confirm: {
+                content: (user) => `确定要${user.status === 1 ? '禁用' : '启用'}用户 "${user.username}" 吗?`,
+                confirmButton: '确认',
+                cancelButton: '取消'
+            }
         }
     ];
 
-    // 切换用户状态
-    async function handleToggleStatus(user) {
-        try {
-            // TODO: 实现用户状态切换的 API 调用
-            await userAPI.manageUser(user.username, user.status === 1 ? 'disable' : 'enable');
-            toast.success(`${user.username} 状态已更新`);
-            await fetchUsers(currentPage);
-        } catch (error) {
-            toast.error(error.message || '更新用户状态失败');
-        }
-    }
-
-    // 编辑用户
-    function handleEdit(user) {
-        // TODO: 实现用户编辑功能
-        toast.info(`编辑用户: ${user.username}`);
-    }
-
-    // 分页变化处理
-    const handlePageChange = (newPage) => {
-        setCurrentPage(newPage);
-        fetchUsers(newPage);
-    };
-
     return (
         <div className="p-4">
-            <Dimmer active={loading} inverted>
-                <Loader>加载中...</Loader>
-            </Dimmer>
-
-            <DataList
-                title="用户列表"
-                data={users}
+            <h2>用户列表</h2>
+            <Button primary onClick={handleAddUser} style={{ marginBottom: '1rem' }}>添加用户</Button>
+            
+            <UserTable
+                title="用户管理"
+                users={users}
+                loading={loading}
                 columns={columns}
                 columnNames={columnNames}
-                renderRow={renderRow}
+                onDelete={handleDeleteClick}
                 customActions={customActions}
-                currentPage={currentPage}
-                pageSize={pageSize}
-                totalItems={totalItems}
-                onPageChange={handlePageChange}
             />
+
+            {/* 添加用户的模态框 */}
+            <Modal
+                open={isModalOpen}
+                onClose={handleModalClose}
+                size="small"
+                closeOnDimmerClick={false}
+                aria-labelledby="modal-header"
+            >
+                <Modal.Header id="modal-header">添加新用户</Modal.Header>
+                <Modal.Content>
+                    <Form error={!!modalError}>
+                        <Form.Field>
+                            <label>用户名</label>
+                            <Input
+                                placeholder="输入用户名..."
+                                name="username"
+                                value={newUserData.username}
+                                onChange={handleInputChange}
+                            />
+                        </Form.Field>
+                        <Form.Field>
+                            <label>显示名称</label>
+                            <Input
+                                placeholder="输入显示名称..."
+                                name="display_name"
+                                value={newUserData.display_name}
+                                onChange={handleInputChange}
+                            />
+                        </Form.Field>
+                        <Form.Field>
+                            <label>电子邮箱</label>
+                            <Input
+                                placeholder="输入电子邮箱..."
+                                name="email"
+                                value={newUserData.email}
+                                onChange={handleInputChange}
+                            />
+                        </Form.Field>
+                        <Form.Field>
+                            <label>密码</label>
+                            <Input
+                                type="password"
+                                placeholder="输入密码..."
+                                name="password"
+                                value={newUserData.password}
+                                onChange={handleInputChange}
+                            />
+                        </Form.Field>
+                        <Form.Field>
+                            <label>角色</label>
+                            <RoleSelector
+                                value={newUserData.role}
+                                onChange={(e, { value }) => setNewUserData(prev => ({ ...prev, role: value }))}
+                            />
+                        </Form.Field>
+                        {modalError && <Message error content={modalError} />}
+                    </Form>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button onClick={handleModalClose}>取消</Button>
+                    <Button primary onClick={handleSubmitNewUser}>添加</Button>
+                </Modal.Actions>
+            </Modal>
         </div>
     );
 };

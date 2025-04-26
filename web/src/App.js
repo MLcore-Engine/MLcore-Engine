@@ -23,6 +23,7 @@ const ModelDeployment = lazy(() => import('./pages/ModelDeployment'));
 const ServingList = lazy(() => import('./pages/Serving/ServingList'));
 const User = lazy(() => import('./pages/User'));
 const UserList = lazy(() => import('./pages/User/UserList'));
+const UserRole = lazy(() => import('./pages/User/UserRole'));
 const Setting = lazy(() => import('./pages/Setting'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -73,7 +74,11 @@ function App() {
 		      <Route path="/project" element={<Navigate to="/project/project_list" replace />} />
           <Route path="/project/project_list" element={<PrivateRoute><ProjectGroupOrg /></PrivateRoute>} />
           <Route path="/project/project_manage" element={<PrivateRoute><ProjectManage /></PrivateRoute>} />
-          <Route path="/project/user_list" element={<PrivateRoute><UserList /></PrivateRoute>} />
+          
+          {/* user manage module */}
+          <Route path="/user" element={<Navigate to="/user/user_list" replace />} />
+          <Route path="/user/user_list" element={<PrivateRoute><UserList /></PrivateRoute>} />
+          <Route path="/user/user_role" element={<PrivateRoute><UserRole /></PrivateRoute>} />
           
           {/* online developing module */}
           <Route path="/notebook" element={<Navigate to="/notebook/env-list" replace />} />
@@ -88,8 +93,6 @@ function App() {
           <Route path="/image" element={<PrivateRoute><ImageManagement /></PrivateRoute>} />
           <Route path="/train" element={<PrivateRoute><ModelTraining /></PrivateRoute>} />
           <Route path="/deploy" element={<PrivateRoute><ModelDeployment /></PrivateRoute>} />
-          <Route path="/user/*" element={<PrivateRoute><User /></PrivateRoute>} />
-          
           <Route path="/setting" element={<PrivateRoute><Setting /></PrivateRoute>} />
           <Route path="*" element={<NotFound />} />
         </Route>

@@ -1,22 +1,33 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import * as React from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { projectAPI, Project, MemberDTO } from '../api/projectAPI';
+import { projectAPI, Project} from '../api/projectAPI';
 import { toast } from 'react-toastify';
-
+import type { ReactNode } from 'react';
 interface AuthContextType {
   isAuthenticated: boolean;
+  token?: string;
 }
 
+/**
+ * 项目上下文接口
+ * 定义了项目管理所需的所有方法和状态
+ */
 interface ProjectContextType {
+  // 状态
   projects: Project[];
   loading: boolean;
+  
+  // 项目操作方法
   fetchProjects: () => Promise<void>;
-  addProjectMember: (projectId: string, member: { userID: string; role: number }) => Promise<void>;
-  removeProjectMember: (projectId: string, memberId: string) => Promise<void>;
-  updateProjectMemberRole: (projectId: string, memberId: string, role: number) => Promise<void>;
   createProject: (projectData: Partial<Project>) => Promise<void>;
   updateProject: (projectId: string, projectData: Partial<Project>) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
+  
+  // 成员操作方法
+  addProjectMember: (projectId: string, member: { userId: string; role: number }) => Promise<void>;
+  removeProjectMember: (projectId: string, userId: string) => Promise<void>;
+  updateProjectMemberRole: (projectId: string, userId: string, role: number) => Promise<void>;
 }
 
 // 创建带默认值的Context，避免null检查
@@ -32,178 +43,255 @@ const defaultContextValue: ProjectContextType = {
   deleteProject: async () => {},
 };
 
-const ProjectContext = createContext(defaultContextValue);
+// 创建项目上下文，使用默认值初始化
+// 使用类型断言确保类型安全，避免运行时错误
+const ProjectContext = createContext<ProjectContextType>(defaultContextValue as ProjectContextType);
 
-// Create a custom Hook to use ProjectContext in components
-export const useProjects = () => {
-  return useContext(ProjectContext);
-};
+/**
+ * 使用项目上下文的自定义Hook
+ * @returns 项目上下文
+ */
+export const useProjects = () => useContext(ProjectContext);
 
-// 类型断言useAuth的返回类型
+/**
+ * 类型断言useAuth的返回类型
+ * @returns 认证上下文
+ */
 export const useAuthWithType = () => useAuth() as AuthContextType;
 
-// ProjectProvider component
-export const ProjectProvider = ({ children }: { children: any }) => {
+
+/**
+ * 项目上下文提供者组件
+ */
+export const ProjectProvider = ({ children }: { children?: ReactNode }): ReactNode => {
   const { isAuthenticated } = useAuthWithType();
-  // 添加明确的类型
   const [projects, setProjects] = useState([] as Project[]);
   const [loading, setLoading] = useState(false);
 
-  /***************************** Project Members API *****************************/
-  // Fetch all projects
-  const fetchProjects = async () => { 
-    
-    if (!isAuthenticated) {
-      return;
-    }
+  /**
+   * 获取所有项目
+   */
+  const fetchProjects = async (): Promise<void> => {
+    if (!isAuthenticated) return;
+
     setLoading(true);
     try {
-      // projectAPI.getProjects()现在直接返回项目数组
-      const projectsData = await projectAPI.getProjects();
-      // 确保projectsData是数组
-      if (Array.isArray(projectsData)) {
-        setProjects(projectsData);
-      } else {
-        console.error('Expected array but got:', typeof projectsData);
-        setProjects([]);
-      }
-    } catch (err: any) {
-      if (err.response && err.response.status === 401) {
-        console.log('Unauthorized. Please login again.');
-      } else {
-        toast.error(err.message || 'Failed to fetch projects.');
-        console.error('API Error in fetchProjects:', err);
-      }
-      // 确保在出错时设置为空数组
+      // 1. 调用 API，拿到原始列表
+      const raw = await projectAPI.getProjects(/* 可传 page,limit */) 
+      // raw.projects: any[]，这里暂时当成 RawProject[]
+
+      // 2. 逐条映射
+      const formatted: Project[] = raw.projects.map((p: any) => ({
+        id:          String(p.id),                 // 数字 -> 字符串
+        name:        p.name,                       // 原样
+        description: p.description,                // 原样
+        createdAt:   p.created_at,                 // snake -> camel
+        updatedAt:   p.updated_at,                 // 同上
+        users: Array.isArray(p.users)             // 可能没 users
+          ? p.users.map((u: any) => ({
+              id:        String(u.userId),         // MemberDTO.id
+              projectId: String(u.projectId),      // projectId
+              userId:    String(u.userId),         // userId
+              username:  u.username,               // 原样
+              role:      u.role                    // 原样数字
+            }))
+          : []
+      }));
+
+      // 3. 赋值到 Context 状态
+      setProjects(formatted);
+
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '获取项目列表失败';
+      toast.error(msg);
+      console.error('[项目上下文] fetchProjects error:', err);
+
+      // 失败时清空列表
       setProjects([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // 添加项目成员
-  
-  const addProjectMember = async (projectId: string, member: { userID: string; role: number }) => {
+  /**
+   * 添加项目成员
+   * @param projectId 项目ID
+   * @param member 成员信息
+   */
+  const addProjectMember = async (projectId: string, member: { userId: string; role: number }): Promise<void> => {
     setLoading(true);
     try {
-      const newMember = await projectAPI.addProjectMember(projectId, member);
-      setProjects((prevProjects: Project[]) =>
-        prevProjects.map((project: Project) =>
-          project.ID === projectId
+      // 转换参数名称以符合API期望
+      // const apiMember = {
+      //   userId: member.userId,
+      //   role: member.role
+      // };
+      
+      const newMember = await projectAPI.addProjectMember(projectId, member.userId, member.role);
+      
+      // 更新本地状态
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === projectId
             ? { ...project, users: [...(project.users || []), newMember] }
             : project
         )
       );
-      toast.info('Member added successfully.');
-    } catch (err: any) {
-      console.error("API Error in addProjectMember: ", err);
-      toast.error(err.message || 'Failed to add member.');
+      
+      toast.success('成员添加成功');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '添加成员失败';
+      toast.error(errorMessage);
+      console.error('[项目上下文] 添加成员失败:', err);
     } finally {
       setLoading(false);
     }
   };
 
-
-  // remove project member
-  const removeProjectMember = async (projectId: string, memberId: string) => {
+  /**
+   * 移除项目成员
+   * @param projectId 项目ID
+   * @param userId 成员ID
+   */
+  const removeProjectMember = async (projectId: string, userId: string): Promise<void> => {
+    if (!userId || !projectId) {
+      console.error('[项目上下文] 移除成员失败: 缺少必要参数', { projectId, userId });
+      toast.error('移除成员失败: 缺少必要参数');
+      return;
+    }
+    
     setLoading(true);
     try {
-      await projectAPI.removeProjectMember(projectId, memberId);
-      setProjects((prevProjects: Project[]) =>
-        prevProjects.map((project: Project) =>
-          project.ID === projectId
+      console.log('[项目上下文] 准备移除成员:', { projectId, userId });
+      await projectAPI.removeProjectMember(projectId, userId);
+      
+      // 更新本地状态，使用userId字段匹配
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === projectId
             ? {
                 ...project,
-                users: project.users?.filter((user: MemberDTO) => user.userID !== memberId),
+                users: project.users?.filter((user) => String(user.userId) !== userId),
               }
             : project
         )
       );
-      toast.info('Member removed successfully.');
-    } catch (err: any) {
-      console.error("API Error in removeProjectMember: ", err);
-      toast.error(err.message || 'Failed to remove member.');
+      
+      toast.success('成员已移除');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '移除成员失败';
+      toast.info(errorMessage);
+      // console.error('[项目上下文] 移除成员失败:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const updateProjectMemberRole = async (projectId: string, memberId: string, role: number) => {
+  /**
+   * 更新项目成员角色
+   * @param projectId 项目ID
+   * @param userId 成员ID
+   * @param role 角色ID
+   */
+  const updateProjectMemberRole = async (projectId: string, userId: string, role: number): Promise<void> => {
     setLoading(true);
     try {
-      const updatedMember = await projectAPI.updateUserProjectRole(projectId, memberId, role);
-      setProjects((prevProjects: Project[]) =>
-        prevProjects.map((project: Project) =>
-          project.ID === projectId
+      // 使用正确的API方法名
+      const updatedMember = await projectAPI.updateProjectMemberRole(projectId, userId, role);  
+      
+      // 更新本地状态，使用userId字段匹配
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === projectId
             ? {
                 ...project,
-                users: project.users?.map((user: MemberDTO) =>
-                  user.userID === memberId ? { ...user, role: updatedMember.role } : user
+                users: project.users?.map((user) =>
+                  String(user.userId) === userId
+                    ? { ...user, role: updatedMember.role }
+                    : user
                 ),
               }
             : project
         )
       );
-      toast.success('Member role updated successfully.');
-    } catch (err: any) {
-      console.error("API Error in updateProjectMemberRole: ", err);
-      toast.error(err.message || 'Failed to update member role.');
+      toast.success('成员角色已更新');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '更新成员角色失败';
+      toast.error(errorMessage);
+      console.error('[项目上下文] 更新成员角色失败:', err);
     } finally {
       setLoading(false);
     }
   };
 
-
-  /***************************** Project API *****************************/
-  // create project
-  const createProject = async (projectData: Partial<Project>) => {
+  /**
+   * 创建项目
+   * @param projectData 项目数据
+   */
+  const createProject = async (projectData: Partial<Project>): Promise<void> => {
     setLoading(true);
     try {
       const newProject = await projectAPI.createProject(projectData);
-      setProjects((prevProjects: Project[]) => [...prevProjects, newProject]);
-    } catch (err: any) {
-      console.error("API Error in createProject: ", err);
-      throw err; 
+      setProjects((prevProjects) => [...prevProjects, newProject]);
+      
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '创建项目失败';
+      toast.error(errorMessage);
+      console.error('[项目上下文] 创建项目失败:', err);
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  // update an existingproject
-  const updateProject = async (projectId: string, projectData: Partial<Project>) => {
+  /**
+   * 更新项目
+   * @param projectId 项目ID
+   * @param projectData 项目数据
+   */
+  const updateProject = async (projectId: string, projectData: Partial<Project>): Promise<void> => {
     setLoading(true);
     try {
       const updatedProject = await projectAPI.updateProject(projectId, projectData);
-      setProjects((prevProjects: Project[]) =>
-        prevProjects.map((project: Project) =>
-          project.ID === projectId ? updatedProject : project
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === projectId ? updatedProject : project
         )
       );
-    } catch (err: any) {
-      console.error('Error in updateProject:', err);
+      toast.success('项目已更新');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '更新项目失败';
+      toast.error(errorMessage);
+      console.error('[项目上下文] 更新项目失败:', err);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  // delete a project
-  const deleteProject = async (projectId: string) => {
+  /**
+   * 删除项目
+   * @param projectId 项目ID
+   */
+  const deleteProject = async (projectId: string): Promise<void> => {
     setLoading(true);
     try {
       await projectAPI.deleteProject(projectId);
-      setProjects((prevProjects: Project[]) =>
-        prevProjects.filter((project: Project) => project.ID !== projectId)
+      setProjects((prevProjects) =>
+        prevProjects.filter((project) => project.id !== projectId)
       );
-    } catch (err: any) {
-      console.error("API Error in deleteProject: ", err);
+      toast.success('项目已删除');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '删除项目失败';
+      toast.error(errorMessage);
+      console.error('[项目上下文] 删除项目失败:', err);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  // 在组件挂载时获取项目列表
+  // 在组件挂载且认证状态变化时获取项目列表
   useEffect(() => {
     if (isAuthenticated) {
       fetchProjects();

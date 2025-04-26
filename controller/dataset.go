@@ -40,7 +40,7 @@ func CreateDataset(c *gin.Context) {
 	}
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -78,7 +78,7 @@ func CreateDataset(c *gin.Context) {
 		StorageType:      input.StorageType,
 		TemplateType:     input.TemplateType,
 		ProjectID:        input.ProjectID,
-		UserID:           userID.(uint),
+		UserID:           uint(userID.(int)),
 		SchemaDefinition: input.SchemaDefinition,
 	}
 
@@ -147,7 +147,7 @@ func ListDatasets(c *gin.Context) {
 	offset := (page - 1) * limit
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -163,8 +163,8 @@ func ListDatasets(c *gin.Context) {
 	// 1. 用户创建的数据集
 	// 2. 用户所在项目的数据集
 	query := model.DB.Model(&model.Dataset{}).
-		Joins("LEFT JOIN user_project ON user_project.project_id = datasets.project_id").
-		Where("datasets.user_id = ? OR (user_project.user_id = ? AND user_project.deleted_at IS NULL)", userID, userID).
+		Joins("LEFT JOIN user_projects ON user_projects.project_id = datasets.project_id").
+		Where("datasets.user_id = ? OR (user_projects.user_id = ? AND user_projects.deleted_at IS NULL)", userID, userID).
 		Group("datasets.id")
 
 	// 计算总数
@@ -213,7 +213,7 @@ func ListDatasets(c *gin.Context) {
 // @Router /api/dataset/{id} [get]
 func GetDataset(c *gin.Context) {
 	id := c.Param("id")
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -237,7 +237,7 @@ func GetDataset(c *gin.Context) {
 	}
 
 	// 验证访问权限
-	if dataset.UserID != userID.(uint) {
+	if dataset.UserID != uint(userID.(int)) {
 		// 检查是否为项目成员
 		if dataset.ProjectID != 0 {
 			var projectUser model.UserProject
@@ -277,7 +277,7 @@ func GetDataset(c *gin.Context) {
 // @Router /api/dataset/{id} [put]
 func UpdateDataset(c *gin.Context) {
 	id := c.Param("id")
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -297,7 +297,7 @@ func UpdateDataset(c *gin.Context) {
 	}
 
 	// 验证是否为创建者
-	if dataset.UserID != userID.(uint) {
+	if dataset.UserID != uint(userID.(int)) {
 		c.JSON(http.StatusForbidden, gin.H{
 			"success": false,
 			"message": "只有数据集创建者可以修改数据集信息",
@@ -396,7 +396,7 @@ func UpdateDataset(c *gin.Context) {
 // @Router /api/dataset/{id} [delete]
 func DeleteDataset(c *gin.Context) {
 	id := c.Param("id")
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -416,7 +416,7 @@ func DeleteDataset(c *gin.Context) {
 	}
 
 	// 验证是否为创建者
-	if dataset.UserID != userID.(uint) {
+	if dataset.UserID != uint(userID.(int)) {
 		c.JSON(http.StatusForbidden, gin.H{
 			"success": false,
 			"message": "只有数据集创建者可以删除数据集",
@@ -526,7 +526,7 @@ func SearchDatasets(c *gin.Context) {
 	offset := (page - 1) * limit
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -540,8 +540,8 @@ func SearchDatasets(c *gin.Context) {
 
 	// 构造查询
 	dbQuery := model.DB.Model(&model.Dataset{}).
-		Joins("LEFT JOIN user_project ON user_project.project_id = datasets.project_id").
-		Where("datasets.user_id = ? OR (user_project.user_id = ? AND user_project.deleted_at IS NULL)", userID, userID)
+		Joins("LEFT JOIN user_projects ON user_projects.project_id = datasets.project_id").
+		Where("datasets.user_id = ? OR (user_projects.user_id = ? AND user_projects.deleted_at IS NULL)", userID, userID)
 
 	// 添加搜索条件
 	if query != "" {
@@ -612,7 +612,7 @@ func GetProjectDatasets(c *gin.Context) {
 	offset := (page - 1) * limit
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,

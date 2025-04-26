@@ -42,7 +42,7 @@ func GetDatasetEntries(c *gin.Context) {
 	offset := (page - 1) * limit
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -62,7 +62,7 @@ func GetDatasetEntries(c *gin.Context) {
 	}
 
 	// 验证访问权限
-	if dataset.UserID != userID.(uint) && dataset.ProjectID != 0 {
+	if dataset.UserID != uint(userID.(int)) && dataset.ProjectID != 0 {
 		// 检查是否为项目成员
 		var projectUser model.UserProject
 		if err := model.DB.Where("project_id = ? AND user_id = ?", dataset.ProjectID, userID).First(&projectUser).Error; err != nil {
@@ -215,7 +215,7 @@ func GetDatasetEntry(c *gin.Context) {
 	entryID := c.Param("entryId")
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -235,7 +235,7 @@ func GetDatasetEntry(c *gin.Context) {
 	}
 
 	// 验证访问权限
-	if dataset.UserID != userID.(uint) && dataset.ProjectID != 0 {
+	if dataset.UserID != uint(userID.(int)) && dataset.ProjectID != 0 {
 		// 检查是否为项目成员
 		var projectUser model.UserProject
 		if err := model.DB.Where("project_id = ? AND user_id = ?", dataset.ProjectID, userID).First(&projectUser).Error; err != nil {
@@ -341,7 +341,7 @@ func CreateDatasetEntry(c *gin.Context) {
 	id := c.Param("id")
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -362,7 +362,7 @@ func CreateDatasetEntry(c *gin.Context) {
 
 	// 验证编辑权限
 	hasEditPermission := false
-	if dataset.UserID == userID.(uint) {
+	if dataset.UserID == uint(userID.(int)) {
 		hasEditPermission = true
 	} else if dataset.ProjectID != 0 {
 		// 检查是否为项目成员且有编辑权限
@@ -496,7 +496,7 @@ func UpdateDatasetEntry(c *gin.Context) {
 	entryID := c.Param("entryId")
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -517,7 +517,7 @@ func UpdateDatasetEntry(c *gin.Context) {
 
 	// 验证编辑权限
 	hasEditPermission := false
-	if dataset.UserID == userID.(uint) {
+	if dataset.UserID == uint(userID.(int)) {
 		hasEditPermission = true
 	} else if dataset.ProjectID != 0 {
 		// 检查是否为项目成员且有编辑权限
@@ -671,7 +671,7 @@ func DeleteDatasetEntry(c *gin.Context) {
 	entryID := c.Param("entryId")
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -692,7 +692,7 @@ func DeleteDatasetEntry(c *gin.Context) {
 
 	// 验证编辑权限
 	hasEditPermission := false
-	if dataset.UserID == userID.(uint) {
+	if dataset.UserID == uint(userID.(int)) {
 		hasEditPermission = true
 	} else if dataset.ProjectID != 0 {
 		// 检查是否为项目成员且有编辑权限

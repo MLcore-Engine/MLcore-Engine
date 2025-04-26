@@ -219,7 +219,7 @@ const DataList = ({
             {filteredData.length > 0 ? (
               filteredData.map((item) => {
                 const rowData = renderRow ? renderRow(item) : item;
-                const rowKey = item.ID || item.id || `row-${Math.random()}`;
+                const rowKey = item.id || item.ID || `row-${Math.random()}`;
                 
                 return (
                   <Table.Row key={rowKey} className="data-row">

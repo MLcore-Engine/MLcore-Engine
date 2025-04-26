@@ -65,7 +65,9 @@ func main() {
 	model.InitOptionMap()
 
 	// Initialize HTTP server
-	server := gin.Default()
+	server := gin.New()
+	server.Use(gin.Logger())
+	server.Use(gin.Recovery())
 	//server.Use(gzip.Gzip(gzip.DefaultCompression))
 	server.Use(middleware.CORS())
 
@@ -78,7 +80,8 @@ func main() {
 		store := cookie.NewStore([]byte(common.SessionSecret))
 		server.Use(sessions.Sessions("session", store))
 	}
-
+	server.RedirectTrailingSlash = false
+	server.RedirectFixedPath = false
 	router.SetRouter(server, buildFS, indexPage)
 
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

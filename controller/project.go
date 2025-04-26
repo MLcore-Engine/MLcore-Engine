@@ -52,27 +52,51 @@ func CreateProject(c *gin.Context) {
 func UpdateProject(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid project ID"})
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Success: false,
+			Message: "无效的项目ID",
+		})
 		return
 	}
 
 	var project model.Project
 	if err := model.DB.First(&project, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
+		c.JSON(http.StatusNotFound, ErrorResponse{
+			Success: false,
+			Message: "项目不存在",
+		})
 		return
 	}
 
 	if err := c.ShouldBindJSON(&project); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Success: false,
+			Message: err.Error(),
+		})
 		return
 	}
 
 	if err := model.DB.Save(&project).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update project"})
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Success: false,
+			Message: "更新项目失败",
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": project})
+	// 将模型转换为DTO
+	projectDTO := ProjectDTO{
+		ID:          project.ID,
+		Name:        project.Name,
+		Description: project.Description,
+		// 添加其他必要字段
+	}
+
+	c.JSON(http.StatusOK, SuccessResponse{
+		Success: true,
+		Message: "项目更新成功",
+		Data:    projectDTO,
+	})
 }
 
 // DeleteProject godoc
@@ -89,16 +113,28 @@ func UpdateProject(c *gin.Context) {
 func DeleteProject(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid project ID"})
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Success: false,
+			Message: "无效的项目ID",
+		})
 		return
 	}
 
 	if err := model.DB.Delete(&model.Project{}, id).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete project"})
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Success: false,
+			Message: "删除项目失败: " + err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Project successfully deleted"})
+	c.JSON(http.StatusOK, SuccessResponse{
+		Success: true,
+		Message: "项目删除成功",
+		Data: DeleteOperationResult{
+			ID: uint(id),
+		},
+	})
 }
 
 // GetProject godoc
@@ -169,14 +205,39 @@ func ListProjects(c *gin.Context) {
 		return
 	}
 
+	projectDTOs := make([]ProjectDTO, len(projects))
+	for i, project := range projects {
+
+		users := make([]MemberDTO, len(project.Users))
+		for j, user := range project.Users {
+			users[j] = MemberDTO{
+				ProjectId: project.ID,
+				UserId:    user.ID,
+				Username:  user.Username,
+				Role:      user.Role,
+			}
+		}
+
+		projectDTOs[i] = ProjectDTO{
+			ID:          project.ID,
+			Name:        project.Name,
+			Description: project.Description,
+			// 添加其他必要字段
+			Users: users,
+			// 可能需要根据实际情况添加更多字段
+		}
+	}
+
 	c.JSON(http.StatusOK, SuccessResponse{
 		Success: true,
 		Message: "Projects retrieved successfully",
-		Data: gin.H{
-			"projects": projects,
-			"total":    total,
-			"page":     page,
-			"limit":    limit,
+		Data: ProjectListData{
+			Projects: projectDTOs,
+			PagedData: PagedData{
+				Total: total,
+				Page:  page,
+				Limit: limit,
+			},
 		},
 	})
 }
