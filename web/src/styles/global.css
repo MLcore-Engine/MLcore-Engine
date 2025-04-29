@@ -5,10 +5,12 @@ body {
     margin: 0;
     padding-top: 20px;
     overflow-y: scroll;
-    font-family: Lato, 'Helvetica Neue', Arial, Helvetica, "Microsoft YaHei", sans-serif;
+    font-family: 'Inter', 'Helvetica Neue', Arial, Helvetica, "Microsoft YaHei", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scrollbar-width: none;
+    background-color: #f8f9fa;
+    color: #333;
 }
 
 body::-webkit-scrollbar {
@@ -20,7 +22,7 @@ code {
 }
 
 .main-content {
-    padding: 4px;
+    padding: 1rem;
 }
 
 .small-icon .icon {
@@ -31,8 +33,125 @@ code {
     font-size: 1.1em;
 }
 
+/* 现代UI组件样式 */
+.ui.menu {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: none;
+}
+
+.ui.menu .item {
+    font-weight: 500;
+}
+
+.ui.menu .active.item {
+    background-color: rgba(19, 62, 135, 0.08) !important;
+    font-weight: 600;
+    color: var(--primary-color) !important;
+}
+
+.ui.menu a.item:hover {
+    background-color: rgba(19, 62, 135, 0.05);
+}
+
+.ui.segment {
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: none;
+    padding: 1.5rem;
+}
+
+.ui.table {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    border: none;
+}
+
+.ui.table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 1rem 0.8rem;
+}
+
+.ui.table td {
+    padding: 0.9rem 0.8rem;
+}
+
+.ui.button {
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.ui.primary.button {
+    background-color: var(--primary-color);
+}
+
+.ui.primary.button:hover {
+    background-color: #0e2f68;
+}
+
+/* Card 样式现代化 */
+.ui.card {
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.ui.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 搜索框样式 */
+.ui.input > input {
+    border-radius: 0.375rem;
+    border: 1px solid #e0e0e0;
+    padding: 0.6rem 1rem;
+}
+
+.ui.input > input:focus {
+    border-color: var(--primary-color);
+}
+
+/* 响应式布局 */
 @media only screen and (max-width: 600px) {
     .hide-on-mobile {
         display: none !important;
     }
+    
+    .ui.container {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    .ui.segment {
+        padding: 1rem;
+    }
+}
+
+/* 表格行悬停效果 */
+.ui.table tr:hover {
+    background-color: rgba(19, 62, 135, 0.03);
+}
+
+/* 操作按钮样式 */
+.action-button {
+    border-radius: 0.375rem !important;
+    padding: 0.5rem !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 分页组件样式 */
+.ui.pagination.menu {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    margin-top: 1rem;
+}
+
+.ui.pagination.menu .active.item {
+    background-color: var(--primary-color) !important;
+    color: white !important;
 }

@@ -31,7 +31,7 @@ func ImportDataset(c *gin.Context) {
 	id := c.Param("id")
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -52,7 +52,7 @@ func ImportDataset(c *gin.Context) {
 
 	// 验证编辑权限
 	hasEditPermission := false
-	if dataset.UserID == userID.(uint) {
+	if dataset.UserID == uint(userID.(int)) {
 		hasEditPermission = true
 	} else if dataset.ProjectID != 0 {
 		// 检查是否为项目成员且有编辑权限
@@ -268,7 +268,7 @@ func ExportDataset(c *gin.Context) {
 	id := c.Param("id")
 
 	// 获取当前用户ID
-	userID, exists := c.Get("id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -289,7 +289,7 @@ func ExportDataset(c *gin.Context) {
 
 	// 验证访问权限
 	hasViewPermission := false
-	if dataset.UserID == userID.(uint) {
+	if dataset.UserID == uint(userID.(int)) {
 		hasViewPermission = true
 	} else if dataset.ProjectID != 0 {
 		// 检查是否为项目成员

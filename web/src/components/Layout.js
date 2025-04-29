@@ -17,14 +17,45 @@ const Layout = () => {
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      minHeight: '100vh',
+      backgroundColor: '#f8f9fa'
+    }}>
       <Header />
-      <div style={{ display: 'flex', flex: 1, marginTop: '60px' }}>
-        {hasSidebar && <SidebarComponent />}
-        <div style={{ flex: 1, overflowX: 'hidden' }}>
+      <div style={{ 
+        display: 'flex', 
+        flex: 1, 
+        marginTop: '60px',
+        gap: '1rem',
+        padding: '0.5rem'
+      }}>
+        {hasSidebar && (
+          <div style={{
+            width: '250px',
+            transition: 'all 0.3s ease',
+            borderRadius: '0.75rem',
+            backgroundColor: '#fff',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+            padding: '1rem 0',
+            alignSelf: 'flex-start',
+            position: 'sticky',
+            top: '70px'
+          }}>
+            <SidebarComponent />
+          </div>
+        )}
+        <div style={{ 
+          flex: 1, 
+          overflowX: 'hidden',
+          transition: 'all 0.3s ease'
+        }}>
           <Container style={{
-            paddingTop: '2em',
-            paddingBottom: '2em',
+            padding: '1.5rem',
+            backgroundColor: '#fff',
+            borderRadius: '0.75rem',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
             minHeight: isHomePage ? 'calc(100vh - 180px)' : 'calc(100vh - 120px)'
           }}>
             <Outlet />

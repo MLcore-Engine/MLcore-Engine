@@ -723,3 +723,100 @@ func GetToken(c *gin.Context) {
 		},
 	})
 }
+
+// ListUsers 列出所有用户
+func ListUsers(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+	if page < 1 {
+		page = 1
+	}
+
+	if limit < 1 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
+	users, total, err := model.GetAllUsers(offset, limit)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data": gin.H{
+			"users": users,
+			"total": total,
+			"page":  page,
+			"limit": limit,
+		},
+	})
+}
+
+// UpdateUserStatus 更新用户状态
+func UpdateUserStatus(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "无效的用户ID",
+		})
+		return
+	}
+
+	var statusData struct {
+		Status int `json:"status"`
+	}
+
+	if err := c.ShouldBindJSON(&statusData); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "无效的请求数据",
+		})
+		return
+	}
+
+	if statusData.Status != 0 && statusData.Status != 1 {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "状态值无效，只能为0或1",
+		})
+		return
+	}
+
+	user, err := model.GetUserById(uint(id), false)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	myRole := c.GetInt("role")
+	if myRole <= user.Role {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "无权更新同权限等级或更高权限等级的用户状态",
+		})
+		return
+	}
+
+	user.Status = statusData.Status
+	if err := user.Update(false); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+	})
+}

@@ -1,0 +1,16 @@
+          </Table.Header>
+          <Table.Body>
+            {filteredData.length > 0 ? (
+              filteredData.map((item) => {
+                const rowData = renderRow ? renderRow(item) : item;
+                const rowKey = item.id;
+                
+                return (
+                  <Table.Row key={rowKey} className="data-row">
+                    {columns.map((column) => (
+                      <Table.Cell key={`${rowKey}-${column}`}>
+                        {rowData[column]}
+                      </Table.Cell>
+                    ))}
+                    <Table.Cell textAlign="center">
+                      <div className="action-buttons">

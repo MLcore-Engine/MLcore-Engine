@@ -1,0 +1,23 @@
+   * @param {Object} item - 项目对象，必须包含id字段
+   */
+  const handleDelete = async (item: Project) => {
+    try {
+      await deleteProject(item.id);
+      toast.info('项目删除成功');
+    } catch (err) {
+      // console.error(err.message);
+      toast.info(err.message || '项目删除失败');
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!projectData.name || !projectData.name.trim()) {
+      setModalError('project name is required');  
+      return;
+    }
+
+    setIsSubmitting(true);
+    setModalError('');
+
+    try {
+      if (modalType === 'add') {

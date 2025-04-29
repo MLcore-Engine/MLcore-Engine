@@ -75,7 +75,7 @@ export function showError(error) {
           }
           break;
         case 429:
-          toast.error('错误：请求次数过多，请稍后再试！', showErrorOptions);
+          toast.error('错误：请求次数过多，请稍后再试！', showErrorOptions);  
           break;
         case 500:
           toast.error('错误：服务器内部错误，请联系管理员！', showErrorOptions);
